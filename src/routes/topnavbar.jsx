@@ -5,6 +5,7 @@ import { auth, db } from "../firebase-config";
 import { Link, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth"; // Import the signOut function from Firebase
 import { doc, getDoc } from "firebase/firestore";
+import Logo from "../assets/Logo.png";
 
 // CREATE FUNCTION
 export default function NavBar() {
@@ -66,6 +67,12 @@ export default function NavBar() {
           <nav className="bg-white shadow">
             <div className=" flex items-center justify-between px-2 md:px-6">
               <div className="flex flex-row items-center pb-2 pt-2 md:pt-4">
+                <img
+                  src={Logo}
+                  alt="Logo"
+                  className="h-[30px] w-[30px]"
+                  style={{ objectFit: "cover" }}
+                />
                 <a className=" ml-1 text-3xl font-bold text-gray-800" href="/">
                   <p>CookBook</p>
                 </a>

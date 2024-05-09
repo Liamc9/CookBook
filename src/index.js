@@ -3,7 +3,16 @@ import ReactDOM from 'react-dom/client'
 import './index.css'
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
 import Root from './routes/root'
-import ExampleRoute from './routes/exampleRoute'
+import Signup from './routes/signup'
+import Login from './routes/login'
+import Feed from './routes/feed'
+import CreatorsPage from './routes/creatorspage'
+import Search from './routes/search'
+import Mycookbook from './routes/mycookbook'
+import Profile from './routes/profile'
+import Subscribinglist from './routes/subscribinglist'
+import Addrecipe from './routes/addrecipe'
+import Recipe from './routes/recipepage'
 
 const router = createBrowserRouter([
     {
@@ -12,16 +21,48 @@ const router = createBrowserRouter([
         children: [
             {
                 index: true, // This makes it the default route for the parent path
-                element: <Navigate to="/search" replace />, // Redirect to /search
+                element: <Navigate to="/feed" replace />, // Redirect to /search
             },
             {
                 path: 'search',
-                element: <ExampleRoute />,
+                element: <Search />,
+            },
+            {
+                path: 'signup',
+                element: <Signup />,
             },
             {
                 path: 'login',
-                element: <ExampleRoute />,
+                element: <Login />,
             },
+            {
+                path: 'feed',
+                element: <Feed />,
+            },
+            {
+                path: 'profile',
+                element: <Profile />,
+            },
+            {
+                path: 'mycookbook',
+                element: <Mycookbook />,
+            },
+            {
+                path: 'subscribing',
+                element: <Subscribinglist />,
+            },
+            {
+                path: 'addrecipe',
+                element: <Addrecipe />,
+            },
+            {
+                path: "creatorspage/:id",
+                element: <CreatorsPage />,
+              },
+              {
+                path: "recipe",
+                element: <Recipe />,
+              },
         ],
     },
 ])

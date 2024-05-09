@@ -1,6 +1,6 @@
 import { Outlet, useLocation } from "react-router-dom";
 import NavBar from "../components/topnavbar";
-import BottomTabs from "../components/bottomnav";
+import BottomTabs from "../components/bottomnavbar";
 import { useEffect } from "react";
 
 export default function Root() {
@@ -11,12 +11,7 @@ export default function Root() {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
-  // Function to determine if the BottomTabs should be hidden
-  const shouldHideBottomTabs = () => {
-    // List the paths where BottomTabs should be hidden
-    const pathsToHide = ["/login", "/signup", "/updatecarddetails"];
-    return pathsToHide.includes(location.pathname);
-  };
+
   const shouldHideTopNav = () => {
     // List the paths where BottomTabs should be hidden
     const pathsToHide = ["/updatecarddetails"];
@@ -29,7 +24,7 @@ export default function Root() {
         {" "}
         {/* Think this is for the phone scroll */}
         {!shouldHideTopNav() && <NavBar />}
-        {!shouldHideBottomTabs() && <BottomTabs />}
+        <BottomTabs />
         <Outlet />
       </div>
     </>
