@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import VideoGallery from './videopage';
 
 export default function Profile() {
     // STATE VARIABLES
@@ -19,7 +20,8 @@ export default function Profile() {
     const getTabContent = () => {
         switch (activeTab) {
             case 1:
-                return <div className="text-center p-4">This will be like a social media style feed where the creators post are</div>;
+                return <div className="text-center p-4">This will be like a social media style feed where the creators post are
+                 <VideoGallery /></div>;
             case 2:
                 return <div className="text-center p-4">This will be the CookBook where the creators recipes are. You have to subscribe to see.</div>;
             case 3:
@@ -38,17 +40,18 @@ export default function Profile() {
                     </div>
                 </div>
                 <h1 className="text-3xl font-bold mt-10">John Doe</h1>
-                <p className="text-gray-500">Software Engineer</p>
+                <p className="text-gray-500">Categories (BBQ) (Indian) (Italian)</p>
                 {/* Tabs Section */}
                 <div className="w-full px-4 py-2 flex justify-around items-center bg-white shadow-lg">
                     <div onClick={() => handleTabClick(1)} className="tab text-center cursor-pointer">
-                        <p className="text-sm text-gray-700 hover:text-blue-500">My Feed</p>
+                        <p className="text-sm text-gray-700 hover:text-custom-brown">My Feed</p>
                     </div>
                     <div onClick={() => handleTabClick(2)} className="tab text-center cursor-pointer">
-                        <p className="text-sm text-gray-700 hover:text-blue-500">Cookbook</p>
+                        <p className="text-sm text-gray-700 hover:text-custom-brown">Cookbook</p>
+                       
                     </div>
                     <div onClick={() => handleTabClick(3)} className="tab text-center cursor-pointer">
-                        <p className="text-sm text-gray-700 hover:text-blue-500">Other</p>
+                        <p className="text-sm text-gray-700 hover:text-custom-brown">Pricing</p>
                     </div>
                 </div>
                 {/* Dynamic Content Based on Active Tab */}
