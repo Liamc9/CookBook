@@ -1,80 +1,55 @@
 // IMPORTS
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import kitchen from "../assets/kitchen.jpg"
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { db } from "../firebase-config";
+import { doc, getDoc } from "firebase/firestore";
+import Chefcard from "../components/chefcard";
+import Search from "../components/search";
 
 // CREATE FUNCTION
 export default function Subscribinglist() {
   // STATE VARIABLES
-  const [state, setState] = useState(0);
-  const navigate = useNavigate();
+  const [subscribingIds, setSubscribingIds] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // JAVASCRIPT LOGIC
-  const handleCardClick = (creatorId) => {
-    navigate(`/creatorspage/${creatorId}`);
-  };
+  // Get the ID of the logged-in user
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+        const userDoc = await getDoc(doc(db, "users", 'LzWLxrHTYQ3CBRt4fx4S'));
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          setSubscribingIds(userData.subscribing || []);
+          console.log('uvuy',userData.subscribing);
+        }
+      setLoading(false);
+    });
+
+    // Clean up the subscription
+    return () => unsubscribe();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   // HTML
   return (
-    <>
-      <head></head>
-      <body>
-        <div className="mt-20">
-          This will be the creators I am subscribing to so I can see their
-          cookbooks
-          <div className="flex h-screen flex-col items-center justify-center gap-4 overflow-y-scroll ">
-          <div className="relative h-40 w-[90%] rounded border overflow-hidden shadow-md"
-          onClick={() => handleCardClick(1)}
-          >
-            <p className="absolute text-4xl text-white font-bold">Creator 1</p>
-            <img
-              src={kitchen}
-              className=""
-              style={{ objectFit: "cover" }}
-            />
-          </div>
-          <div className="relative h-40 w-[90%] rounded border overflow-hidden shadow-md"
-          onClick={() => handleCardClick(1)}
-          >
-            <p className="absolute text-4xl text-white font-bold">Creator 2</p>
-            <img
-              src={kitchen}
-              className=""
-              style={{ objectFit: "cover" }}
-            />
-          </div>
-          <div className="relative h-40 w-[90%] rounded border overflow-hidden shadow-md"
-          onClick={() => handleCardClick(1)}
-          >
-            <p className="absolute text-4xl text-white font-bold">Creator 3</p>
-            <img
-              src={kitchen}
-              className=""
-              style={{ objectFit: "cover" }}
-            />
-          </div>
-          <div className="relative h-40 w-[90%] rounded border overflow-hidden shadow-md"
-          onClick={() => handleCardClick(1)}
-          >
-            <p className="absolute text-4xl text-white font-bold">Creator 4</p>
-            <img
-              src={kitchen}
-              className=""
-              style={{ objectFit: "cover" }}
-            />
-          </div>
-          <div className="h-40 w-[90%] rounded border shadow-md">
-            TCreator 2
-          </div>
-          <div className="h-40 w-[90%] rounded border shadow-md">
-            Creator 3
-          </div>
-          <div className="h-40 w-[90%] rounded border shadow-md">
-            Creator 4
-          </div>
+    <div>
+      <div className="mt-20 mx-auto w-[90%]">
+        <Search />
+        
+        <div className=" mt-10 flex h-screen flex-col gap-4  ">
+        <h1 className=" text-xl font-bold">Subscribed</h1>
+          {subscribingIds.length > 0 ? (
+            subscribingIds.map((chefid) => (
+              <Chefcard key={chefid} chefid={chefid} />
+            ))
+          ) : (
+            <p className="text-center">You are not subscribed to any creators.</p>
+          )}
         </div>
-        </div>
-      </body>
-    </>
+      </div>
+    </div>
   );
 }

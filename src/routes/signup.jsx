@@ -105,66 +105,93 @@ const SignupPage = () => {
         <form onSubmit={handleSignup}>
           <div className="space-y-2">
             <div className="grid grid-cols-2 gap-2">
-              <div className="items-left flex flex-col">
-                <p className="text-sm font-semibold text-gray-700">
-                  First Name
-                </p>
+              <div className="relative  font-sans">
                 <input
+                  name="firstName"
                   id="firstName"
                   type="text"
                   required
-                  className="relative block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                  placeholder="First Name"
+                  value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
+                  className="peer w-full rounded-lg border-2 border-gray-300 bg-transparent p-2.5 text-base outline-none focus:border-b-4 focus:border-custom-brown focus:border-b-custom-brown"
                 />
+                <label
+                  htmlFor="firstName"
+                  className={`pointer-events-none absolute left-0 m-1 ml-2.5 transform bg-white p-1.5 text-base text-gray-500 transition-transform duration-300 ease-in-out peer-focus:ml-5 peer-focus:-translate-y-[70%] peer-focus:scale-90 peer-focus:px-1 peer-focus:py-0 peer-focus:text-custom-brown ${firstName ? "ml-5 translate-y-[-70%] scale-90 px-1 py-0" : ""}`}
+                >
+                  First Name
+                </label>
               </div>
-              <div className="items-left flex flex-col">
-                <p className="text-sm font-semibold text-gray-700">Last Name</p>
+              <div className="relative font-sans">
                 <input
+                  name="lastName"
                   id="lastName"
                   type="text"
                   required
-                  className="relative block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                  placeholder="Last Name"
+                  value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
+                  className="peer w-full rounded-lg border-2 border-gray-300 bg-transparent p-2.5 text-base outline-none focus:border-b-4 focus:border-custom-brown focus:border-b-custom-brown"
                 />
+                <label
+                  htmlFor="lastName"
+                  className={`pointer-events-none absolute left-0 m-1 ml-2.5 transform bg-white p-1.5 text-base text-gray-500 transition-transform duration-300 ease-in-out peer-focus:ml-5 peer-focus:-translate-y-[70%] peer-focus:scale-90 peer-focus:px-1 peer-focus:py-0 peer-focus:text-custom-brown ${lastName ? "ml-5 translate-y-[-70%] scale-90 px-1 py-0" : ""}`}
+                >
+                  Last Name
+                </label>
               </div>
             </div>
-            <div className="items-left flex flex-col">
-              <p className="text-sm font-semibold text-gray-700">Email</p>
-              <input
-                id="email"
-                type="email"
-                required
-                className="relative block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                placeholder="Email Address"
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div className="items-left flex flex-col">
-              <p className="text-sm font-semibold text-gray-700">Password</p>
-              <input
-                id="password"
-                type="password"
-                required
-                className="relative block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                placeholder="Password"
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            <div className="items-left flex flex-col">
-              <p className="text-sm font-semibold text-gray-700">
-                Re-enter Password
-              </p>
-              <input
-                id="reenterPassword"
-                type="password"
-                required
-                className="relative block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                placeholder="Re-enter Password"
-                onChange={(e) => setReenterPassword(e.target.value)}
-              />
-            </div>
+            <div className="relative my-4  font-sans">
+                <input
+                  name="email"
+                  id="email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="peer w-full rounded-lg border-2 border-gray-300 bg-transparent p-2.5 text-base outline-none focus:border-b-4 focus:border-custom-brown focus:border-b-custom-brown"
+                />
+                <label
+                  htmlFor="email"
+                  className={`pointer-events-none absolute left-0 m-1 ml-2.5 transform bg-white p-1.5 text-base text-gray-500 transition-transform duration-300 ease-in-out peer-focus:ml-5 peer-focus:-translate-y-[70%] peer-focus:scale-90 peer-focus:px-1 peer-focus:py-0 peer-focus:text-custom-brown ${email ? "ml-5 translate-y-[-70%] scale-90 px-1 py-0" : ""}`}
+                >
+                  Email
+                </label>
+              </div>
+              <div className="relative my-4  font-sans">
+                <input
+                  name="password"
+                  id="password"
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="peer w-full rounded-lg border-2 border-gray-300 bg-transparent p-2.5 text-base outline-none focus:border-b-4 focus:border-custom-brown focus:border-b-custom-brown"
+                />
+                <label
+                  htmlFor="password"
+                  className={`pointer-events-none absolute left-0 m-1 ml-2.5 transform bg-white p-1.5 text-base text-gray-500 transition-transform duration-300 ease-in-out peer-focus:ml-5 peer-focus:-translate-y-[70%] peer-focus:scale-90 peer-focus:px-1 peer-focus:py-0 peer-focus:text-custom-brown ${password ? "ml-5 translate-y-[-70%] scale-90 px-1 py-0" : ""}`}
+                >
+                  Password
+                </label>
+              </div>
+              <div className="relative my-4  font-sans">
+                <input
+                  name="reenterpassword"
+                  id="reenterpassword"
+                  type="password"
+                  required
+                  value={reenterPassword}
+                  onChange={(e) => setReenterPassword(e.target.value)}
+                  className="peer w-full rounded-lg border-2 border-gray-300 bg-transparent p-2.5 text-base outline-none focus:border-b-4 focus:border-custom-brown focus:border-b-custom-brown"
+                />
+                <label
+                  htmlFor="reenterpassword"
+                  className={`pointer-events-none absolute left-0 m-1 ml-2.5 transform bg-white p-1.5 text-base text-gray-500 transition-transform duration-300 ease-in-out peer-focus:ml-5 peer-focus:-translate-y-[70%] peer-focus:scale-90 peer-focus:px-1 peer-focus:py-0 peer-focus:text-custom-brown ${reenterPassword ? "ml-5 translate-y-[-70%] scale-90 px-1 py-0" : ""}`}
+                >
+                  Re-enter Password
+                </label>
+              </div>
+            
             <div className="mt-4">
               <label className="inline-flex items-center">
                 <input

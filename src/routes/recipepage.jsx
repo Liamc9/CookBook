@@ -4,12 +4,9 @@ import { useState, useEffect } from 'react'
 // CREATE FUNCTION
 export default function Recipe() {
     // STATE VARIABLES
-    const [state, setState] = useState(0)
 
     // JAVASCRIPT LOGIC
-    useEffect(() => {
-        setState(state + 1)
-    }, [])
+    
 
     // HTML
     return (

@@ -7,7 +7,6 @@ import Signup from './routes/signup'
 import Login from './routes/login'
 import Feed from './routes/feed'
 import CreatorsPage from './routes/creatorspage'
-import Search from './routes/search'
 import Mycookbook from './routes/mycookbook'
 import Profile from './routes/profile'
 import Subscribinglist from './routes/subscribinglist'
@@ -16,6 +15,9 @@ import Recipe from './routes/recipepage'
 import ImageGallery from './routes/imagepage'
 import VideoGallery from './routes/videopage'
 import Videoscroll from './routes/videoscroll'
+import Recipeviewer from './components/creatorcard'
+import Chefcard from './components/chefcard'
+import Editprofile from './routes/editprofile'
 
 const router = createBrowserRouter([
     {
@@ -25,10 +27,6 @@ const router = createBrowserRouter([
             {
                 index: true, // This makes it the default route for the parent path
                 element: <Navigate to="/feed" replace />, // Redirect to /search
-            },
-            {
-                path: 'search',
-                element: <Search />,
             },
             {
                 path: 'signup',
@@ -78,6 +76,18 @@ const router = createBrowserRouter([
                 path: "videoscroll",
                 element: <Videoscroll />,
               },
+              {
+                path: "recipeviewer",
+                element: <Recipeviewer />,
+              },
+              {
+              path: "chefcard",
+              element: <Chefcard />,
+              },
+              {
+                path: "editprofile",
+                element: <Editprofile />,
+                },
         ],
     },
 ])

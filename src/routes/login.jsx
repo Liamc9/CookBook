@@ -37,7 +37,7 @@ const LoginPage = () => {
       );
 
       if (userCredential.user.emailVerified) {
-        navigate("/search");
+        navigate("/");
       } else {
         await auth.signOut();
         setError(
@@ -90,36 +90,43 @@ const LoginPage = () => {
         )}
         <form className="mt-4 space-y-4" onSubmit={handleLogin}>
           <input type="hidden" name="remember" defaultValue="true" />
-          <div className="flex flex-col items-start">
-            <p className="text-sm font-semibold text-gray-700 sm:text-base">
-              Email
-            </p>
-            <input
-              id="email"
-              type="email"
-              name="email"
-              autoComplete="email"
-              required
-              className="relative block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-              placeholder="Email Address"
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div className="flex flex-col items-start">
-            <p className="text-sm font-semibold text-gray-700 sm:text-base">
-              Password
-            </p>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              className="relative block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-              placeholder="Password"
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
+          <div className="relative font-sans">
+                <input
+                  name="email"
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="peer w-full rounded-lg border-2 border-gray-300 bg-transparent p-2.5 text-base outline-none focus:border-b-4 focus:border-custom-brown focus:border-b-custom-brown"
+                />
+                <label
+                  htmlFor="email"
+                  className={`pointer-events-none absolute left-0 m-1 ml-2.5 transform bg-white p-1.5 text-base text-gray-500 transition-transform duration-300 ease-in-out peer-focus:ml-5 peer-focus:-translate-y-[70%] peer-focus:scale-90 peer-focus:px-1 peer-focus:py-0 peer-focus:text-custom-brown ${email ? "ml-5 translate-y-[-70%] scale-90 px-1 py-0" : ""}`}
+                >
+                  Email
+                </label>
+              </div>
+              <div className="relative font-sans">
+                <input
+                  name="password"
+                  id="password"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="peer w-full rounded-lg border-2 border-gray-300 bg-transparent p-2.5 text-base outline-none focus:border-b-4 focus:border-custom-brown focus:border-b-custom-brown"
+                />
+                <label
+                  htmlFor="password"
+                  className={`pointer-events-none absolute left-0 m-1 ml-2.5 transform bg-white p-1.5 text-base text-gray-500 transition-transform duration-300 ease-in-out peer-focus:ml-5 peer-focus:-translate-y-[70%] peer-focus:scale-90 peer-focus:px-1 peer-focus:py-0 peer-focus:text-custom-brown ${password ? "ml-5 translate-y-[-70%] scale-90 px-1 py-0" : ""}`}
+                >
+                  Password
+                </label>
+              </div>
+          
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <input
