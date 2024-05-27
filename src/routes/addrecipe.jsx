@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { storage, db } from "../firebase-config";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { doc, setDoc } from "firebase/firestore";
+import { collection, addDoc } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
 // Mock ingredient suggestions
 const ingredientSuggestions = [
@@ -25,9 +26,16 @@ const AddRecipe = () => {
   const [descriptions, setDescriptions] = useState([[""], [""], [""], [""]]);
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
+  const [recipeName, setRecipeName] = useState("");
+  const [caption, setCaption] = useState("");
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+
+  const auth = getAuth();
+  const user = auth.currentUser;
 
   const nextStep = () => {
-    if (currentStep < 6) {
+    if (currentStep < 7) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -43,6 +51,10 @@ const AddRecipe = () => {
       setOverviewFile(file);
       const previewURL = URL.createObjectURL(file);
       setOverviewFilePreview(previewURL);
+    } else if (index === 'image') {
+      setImageFile(file);
+      const previewURL = URL.createObjectURL(file);
+      setImagePreview(previewURL);
     } else {
       let newFiles = [...files];
       newFiles[index] = file;
@@ -76,12 +88,15 @@ const AddRecipe = () => {
   };
 
   const handleUploadAll = async () => {
-    if (files.some(file => file === null) || !overviewFile) {
+    if (files.some(file => file === null) || !overviewFile || !imageFile) {
       setMessage("Please upload all files before submitting.");
       return;
     }
     setUploading(true);
     try {
+      // Upload image file
+      const imageUrl = await uploadFileAndGetURL(imageFile);
+      
       // Upload overview file
       const overviewUrl = await uploadFileAndGetURL(overviewFile);
       
@@ -95,12 +110,15 @@ const AddRecipe = () => {
       }
 
       // Save the complete recipe to Firestore
-      const recipeDoc = doc(db, "recipes", overviewFile.name);
-      await setDoc(recipeDoc, {
+      await addDoc(collection(db, 'recipes'), {
+        recipeName,
+        caption,
+        imageUrl,
         overviewUrl,
         ingredients,
         steps,
-        uploadedAt: new Date()
+        uploadedAt: new Date(),
+        userId: user.uid // Optional: Save the user's ID who uploaded the recipe
       });
 
       setMessage("All files uploaded successfully and URLs stored in Firestore.");
@@ -132,6 +150,63 @@ const AddRecipe = () => {
           className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
         >
           Begin Recipe
+        </button>
+      </div>
+    </div>
+  );
+
+  const renderRecipeDetailsPage = () => (
+    <div className="p-6 border rounded-lg shadow-lg bg-white max-w-md mx-auto mt-10 mb-20">
+      <h2 className="text-2xl font-bold mb-4">Recipe Details</h2>
+      <div className="mb-4">
+        <label className="block text-gray-700 mb-2">Recipe Name</label>
+        <input
+          type="text"
+          value={recipeName}
+          onChange={(e) => setRecipeName(e.target.value)}
+          className="w-full p-2 border rounded-md"
+        />
+      </div>
+      <div className="mb-4">
+        <label className="block text-gray-700 mb-2">Caption</label>
+        <input
+          type="text"
+          value={caption}
+          onChange={(e) => setCaption(e.target.value)}
+          className="w-full p-2 border rounded-md"
+        />
+      </div>
+      <div className="mb-4">
+        {imagePreview ? (
+          <img
+            src={imagePreview}
+            alt="Recipe"
+            className="w-full h-64 border border-gray-300 rounded-md"
+          />
+        ) : (
+          <label className="block w-full h-64 border-2 border-dashed border-gray-300 rounded-md cursor-pointer flex items-center justify-center text-gray-500">
+            <span>Click to upload an image</span>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => onFileChange(e.target.files[0], 'image')}
+              className="hidden"
+            />
+          </label>
+        )}
+      </div>
+      <div className="flex justify-between mt-4">
+        <button
+          onClick={prevStep}
+          className="rounded bg-gray-500 px-4 py-2 text-white hover:bg-gray-600"
+        >
+          Previous
+        </button>
+        <button
+          onClick={nextStep}
+          className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+        >
+          Next
         </button>
       </div>
     </div>
@@ -235,9 +310,9 @@ const AddRecipe = () => {
     return (
       <div className="p-6 border rounded-lg shadow-lg bg-white max-w-md mx-auto mt-10 mb-20">
         <div className="mb-4">
-          {filePreviews[currentStep - 2] ? (
+          {filePreviews[currentStep - 3] ? (
             <video
-              src={filePreviews[currentStep - 2]}
+              src={filePreviews[currentStep - 3]}
               controls
               className="w-full h-64 border border-gray-300 rounded-md"
             />
@@ -247,23 +322,23 @@ const AddRecipe = () => {
               <input
                 type="file"
                 accept="video/*"
-                onChange={(e) => onFileChange(e.target.files[0], currentStep - 2)}
+                onChange={(e) => onFileChange(e.target.files[0], currentStep - 3)}
                 className="hidden"
               />
             </label>
           )}
         </div>
-        {descriptions[currentStep - 2].map((desc, index) => (
+        {descriptions[currentStep - 3].map((desc, index) => (
           <div key={index} className="mb-4">
             <textarea
               placeholder={`Description ${index + 1}`}
               value={desc}
-              onChange={(e) => onDescriptionChange(e.target.value, currentStep - 2, index)}
+              onChange={(e) => onDescriptionChange(e.target.value, currentStep - 3, index)}
               className="mt-2 p-2 w-full h-24 border rounded-md resize-none"
             />
-            {descriptions[currentStep - 2].length > 1 && (
+            {descriptions[currentStep - 3].length > 1 && (
               <button
-                onClick={() => removeDescriptionField(currentStep - 2, index)}
+                onClick={() => removeDescriptionField(currentStep - 3, index)}
                 className="rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600 mt-2"
               >
                 Remove
@@ -271,9 +346,9 @@ const AddRecipe = () => {
             )}
           </div>
         ))}
-        {descriptions[currentStep - 2].length < 5 && (
+        {descriptions[currentStep - 3].length < 5 && (
           <button
-            onClick={() => addDescriptionField(currentStep - 2)}
+            onClick={() => addDescriptionField(currentStep - 3)}
             className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 mt-2"
           >
             Add Description
@@ -301,6 +376,18 @@ const AddRecipe = () => {
     <div className="p-6 border rounded-lg shadow-lg bg-white max-w-md mx-auto mt-10 mb-20">
       <h2 className="text-2xl font-bold mb-4">Preview and Submit</h2>
       <div className="mb-4">
+        <h3 className="text-xl font-bold mb-2">Recipe Image</h3>
+        {imagePreview && (
+          <img
+            src={imagePreview}
+            alt="Recipe"
+            className="w-full h-64 border border-gray-300 rounded-md mb-4"
+          />
+        )}
+        <h3 className="text-xl font-bold mb-2">Recipe Name</h3>
+        <p>{recipeName}</p>
+        <h3 className="text-xl font-bold mb-2">Caption</h3>
+        <p>{caption}</p>
         <h3 className="text-xl font-bold mb-2">Overview Video</h3>
         {overviewFilePreview && (
           <video
@@ -356,13 +443,15 @@ const AddRecipe = () => {
       case 0:
         return renderBeginPage();
       case 1:
-        return renderOverviewPage();
+        return renderRecipeDetailsPage();
       case 2:
+        return renderOverviewPage();
       case 3:
       case 4:
       case 5:
-        return renderFormStep();
       case 6:
+        return renderFormStep();
+      case 7:
         return renderPreviewPage();
       default:
         return renderBeginPage();

@@ -21,8 +21,6 @@ export default function CreatorsPage() {
       case 1:
         return (
           <div className="p-4 text-center">
-            This will be like a social media style feed where the creators post
-            are
           </div>
         );
       case 2:

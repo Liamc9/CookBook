@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import { db } from "../firebase-config";
 import { collection, getDocs } from "firebase/firestore";
+import FeedCard from "../components/feedcard";
+
 
 
 // CREATE FUNCTION
@@ -28,27 +30,18 @@ export default function Feed() {
     <>
       <head></head>
       <body>
-        <div className="p-4">
+        <div className="p-4 mt-20 overflow-y-scroll">
           {loading ? (
             <p>Loading videos...</p>
           ) : (
-            <div className="flex h-screen flex-col items-center justify-center gap-4 overflow-y-scroll">
+            <div className="flex h-screen flex-col gap-4 ">
               {videos.map((video) => (
                 <div
                   key={video.id}
-                  className="max-w-md overflow-hidden rounded shadow-lg"
+                  className=""
                 >
-                  <video controls className="w-full max-h-48 overflow-hidden">
-                    <source src={video.url} type="video/mp4" />
-                    Your browser does not support the video tag.
-                  </video>
-                  {video.name && (
-                    <div className="px-6 py-4">
-                      <div className="mb-2 text-xl font-bold">{video.name}
-                      <p className="text-sm font-normal text-gray-700">The title should be the meal title and also there will be a caption</p>
-                      </div>
-                    </div>
-                  )}
+                              <FeedCard name= "John Doe" caption="This is a caption" video={video.url}/>
+               
                 </div>
               ))}
             </div>

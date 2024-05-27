@@ -11,7 +11,6 @@ import Mycookbook from './routes/mycookbook'
 import Profile from './routes/profile'
 import Subscribinglist from './routes/subscribinglist'
 import Addrecipe from './routes/addrecipe'
-import Recipe from './routes/recipepage'
 import ImageGallery from './routes/imagepage'
 import VideoGallery from './routes/videopage'
 import Videoscroll from './routes/videoscroll'
@@ -60,10 +59,7 @@ const router = createBrowserRouter([
                 path: "creatorspage/:id",
                 element: <CreatorsPage />,
               },
-              {
-                path: "recipe",
-                element: <Recipe />,
-              },
+             
               {
                 path: "imagegallery",
                 element: <ImageGallery />,
