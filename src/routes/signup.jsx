@@ -96,7 +96,7 @@ const SignupPage = () => {
   return (
     <div className="mt-6 flex min-h-screen items-center justify-center px-2 pb-10">
       <div className="mt-10 w-full max-w-md rounded-lg border bg-white p-6 pt-4 shadow-md">
-        <h2 className="mb-6 text-center text-3xl font-extrabold text-gray-900">
+        <h2 className="mb-6 text-center text-2xl font-extrabold text-gray-900">
           Sign up for an account
         </h2>
         {error && (

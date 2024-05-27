@@ -4,12 +4,22 @@ import { Link } from "react-router-dom";
 import { getAuth } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase-config"; // Adjust the import path as needed
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faFacebook,
+  faTwitter,
+  faYoutube,
+  faTiktok,
+} from "@fortawesome/free-brands-svg-icons";
+import { faUserEdit } from "@fortawesome/free-solid-svg-icons";
+import SubscriptionModal from "../components/subscriptionmodal";
 
 export default function Profile() {
   // STATE VARIABLES
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState(1); // 1 for Tab 1, 2 for Tab 2, 3 for Tab 3
+  const [activeTab, setActiveTab] = useState(1);
+  const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
 
   // Fetch user data from Firestore
   useEffect(() => {
@@ -18,14 +28,14 @@ export default function Profile() {
       const user = auth.currentUser;
 
       if (user) {
-        const userDocRef = doc(db, 'users', user.uid);
+        const userDocRef = doc(db, "users", user.uid);
         try {
           const userDoc = await getDoc(userDocRef);
           if (userDoc.exists()) {
             setUserData(userDoc.data());
           }
         } catch (error) {
-          console.error('Error fetching user data: ', error);
+          console.error("Error fetching user data: ", error);
         }
         setLoading(false);
       }
@@ -57,29 +67,7 @@ export default function Profile() {
             to subscribe to see.
           </div>
         );
-      case 3:
-        return (
-          <div className="p-4 text-center mb-[200px] flex flex-col w-full gap-4">
-            <div className="rounded-lg border border-gray-300 p-4">
-              <p className="mb-2">Subscribe for free</p>
-              <Link
-                to="/pricing"
-                className="bg-custom-brown text-white px-4 py-2 rounded-lg text-sm hover:text-custom-brown"
-              >
-                Subscribe Free
-              </Link>
-            </div>
-            <div className="rounded-lg border border-gray-300 p-4">
-              <p className="mb-2">Get the exclusive subscription</p>
-              <Link
-                to="/pricing"
-                className="bg-custom-brown text-white px-4 py-2 rounded-lg text-sm hover:text-custom-brown"
-              >
-                Subscribe $10
-              </Link>
-            </div>
-          </div>
-        );
+      
       default:
         return <div className="p-4 text-center">Content for Tab 1</div>;
     }
@@ -90,19 +78,60 @@ export default function Profile() {
   }
 
   return (
-    <div className="flex min-h-screen w-full flex-col items-center">
-      <div  className="relative h-64 w-full items-center bg-gray-200">
-        <img src={userData.coverPhoto} className="absolute h-full w-full object-cover" />
-        <img src={userData.profilePic} className="absolute bottom-0 left-1/2 h-32 w-32 -translate-x-1/2 translate-y-1/4 overflow-hidden rounded-full border-4 border-black" />
+    <div className="mt-12 flex min-h-screen w-full flex-col items-center">
+      <div className="aspect-[10/4] w-full">
+        <div className="h-full w-full">
+          <div className="relative flex h-full w-full">
+            <Link to="/editprofile" className="absolute right-2 top-2 z-20 rounded-full bg-white p-2 text-custom-brown">
+        <FontAwesomeIcon icon={faUserEdit} className="text-custom-brown" />
+      </Link>
+            <img
+              src={userData.coverPhoto}
+              className="absolute h-full w-full object-cover"
+              alt="Cover"
+            />
+            <div className="z-10 flex w-[30%] items-center justify-center">
+              <img
+                src={userData.profilePic}
+                className=" aspect-[1/1] w-[80%] rounded-full border-2 border-white"
+                alt="Profile"
+              />
+            </div>
+            <div className="flex w-[60%] flex-col">
+              <div className="flex h-[50%]"></div>
+              <div className="z-20 flex flex-col text-lg font-semibold text-white md:text-xl">
+                <p>
+                  {userData.firstName} {userData.lastName}
+                </p>
+                <p className="text-sm font-normal md:text-lg">
+                  {userData.firstName} {userData.lastName}
+                </p>
+              </div>
+            </div>
+            <div className="absolute bottom-0 h-[50%] w-full bg-gray-500 opacity-50"></div>
+          </div>
+        </div>
       </div>
-      {userData ? (
-        <>
-          <h1 className="mt-10 text-3xl font-bold">{userData.firstName} {userData.lastName}</h1>
-        </>
-      ) : (
-        <h1 className="mt-10 text-3xl font-bold">User</h1>
-      )}
-      <Link to='/editprofile' className='text-custom-brown'>Edit Profile</Link>
+      <div className="flex w-full flex-row justify-between p-4">
+        <div className="flex flex-row gap-2">
+          <div className="p-1 bg-gray-500 items-center justify-center">
+            <FontAwesomeIcon icon={faFacebook} className="text-white" />
+          </div>
+          <div className="p-1 bg-gray-500 items-center justify-center">
+            <FontAwesomeIcon icon={faTwitter} className="text-white" />
+          </div>
+          <div className="p-1 bg-gray-500 items-center justify-center">
+            <FontAwesomeIcon icon={faYoutube} className="text-white" />
+          </div>
+          <div className="p-1 bg-gray-500 items-center justify-center">
+            <FontAwesomeIcon icon={faTiktok} className="text-white" />
+          </div>
+        </div>
+        <button onClick={() => setIsSubscriptionModalOpen(true)} className="flex items-center justify-center rounded bg-custom-brown p-1 text-center text-white">
+          + Subscribe
+        </button>
+      </div>
+      
       {/* Tabs Section */}
       <div className="flex w-full items-center justify-around bg-white px-4 py-2 shadow-lg">
         <div
@@ -121,17 +150,11 @@ export default function Profile() {
             Cookbook
           </p>
         </div>
-        <div
-          onClick={() => handleTabClick(3)}
-          className="tab cursor-pointer text-center"
-        >
-          <p className="text-sm text-gray-700 hover:text-custom-brown">
-            Pricing
-          </p>
-        </div>
+        
       </div>
       {/* Dynamic Content Based on Active Tab */}
       {getTabContent()}
+      <SubscriptionModal isModalOpen={isSubscriptionModalOpen} closeModal={() => setIsSubscriptionModalOpen(false)} />
     </div>
   );
 }
