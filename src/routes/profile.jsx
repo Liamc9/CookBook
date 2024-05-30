@@ -104,7 +104,7 @@ export default function Profile() {
                   {userData.firstName} {userData.lastName}
                 </p>
                 <p className="text-sm font-normal md:text-lg">
-                  {userData.firstName} {userData.lastName}
+                  {userData.firstName} {userData.Categories}
                 </p>
               </div>
             </div>

@@ -77,7 +77,7 @@ const LoginPage = () => {
   return (
     <div className="mt-8 flex min-h-screen items-center justify-center px-2">
       <div className="w-full max-w-md rounded-lg border bg-white p-6 px-4 shadow-md sm:px-6 lg:px-8">
-        <h2 className="text-center text-2xl font-extrabold text-gray-900 sm:text-3xl">
+        <h2 className="text-center text-2xl font-bold text-gray-900 sm:text-3xl">
           Sign in to your account
         </h2>
         {resetEmailSent && (
@@ -99,7 +99,7 @@ const LoginPage = () => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="peer w-full rounded-lg border-2 border-gray-300 bg-transparent p-2.5 text-base outline-none focus:border-b-4 focus:border-custom-brown focus:border-b-custom-brown"
+                  className="peer w-full rounded-lg border-2 border-gray-300 bg-transparent p-2 text-base outline-none focus:border-b-4 focus:border-custom-brown focus:border-b-custom-brown"
                 />
                 <label
                   htmlFor="email"
@@ -117,7 +117,7 @@ const LoginPage = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="peer w-full rounded-lg border-2 border-gray-300 bg-transparent p-2.5 text-base outline-none focus:border-b-4 focus:border-custom-brown focus:border-b-custom-brown"
+                  className="peer w-full rounded-lg border-2 border-gray-300 bg-transparent p-2 text-base outline-none focus:border-b-4 focus:border-custom-brown focus:border-b-custom-brown"
                 />
                 <label
                   htmlFor="password"

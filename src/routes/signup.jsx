@@ -16,8 +16,7 @@ const SignupPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [username, setUsername] = useState("");
   const [reenterPassword, setReenterPassword] = useState("");
   const [isSignupComplete, setIsSignupComplete] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -40,19 +39,17 @@ const SignupPage = () => {
       );
       const user = userCredential.user;
 
-      const formattedFirstName = capitalizeFirstLetter(firstName);
-      const formattedLastName = capitalizeFirstLetter(lastName);
 
       await updateProfile(user, {
-        displayName: `${formattedFirstName} ${formattedLastName}`,
+        displayName: `${username}`,
       });
       await sendEmailVerification(user);
 
       // Additional user data including university name and emblem
       const userData = {
         email: email,
-        firstName: formattedFirstName,
-        lastName: formattedLastName,
+        username: username,
+        chef: false,
       };
       await setDoc(doc(db, "users", user.uid), userData);
       await signOut(auth);
@@ -63,10 +60,6 @@ const SignupPage = () => {
       setIsLoading(false);
       setError(error.message);
     }
-  };
-
-  const capitalizeFirstLetter = (string) => {
-    return string.charAt(0).toUpperCase() + string.slice(1);
   };
 
   if (isSignupComplete) {
@@ -96,50 +89,31 @@ const SignupPage = () => {
   return (
     <div className="mt-6 flex min-h-screen items-center justify-center px-2 pb-10">
       <div className="mt-10 w-full max-w-md rounded-lg border bg-white p-6 pt-4 shadow-md">
-        <h2 className="mb-6 text-center text-2xl font-extrabold text-gray-900">
+        <h2 className="mb-6 text-center text-2xl font-bold text-gray-900">
           Sign up for an account
         </h2>
         {error && (
           <p className="mb-2 text-center text-sm text-red-500">{error}</p>
         )}
         <form onSubmit={handleSignup}>
-          <div className="space-y-2">
-            <div className="grid grid-cols-2 gap-2">
+          <div className="space-y-3">
               <div className="relative  font-sans">
                 <input
-                  name="firstName"
-                  id="firstName"
+                  name="username"
+                  id="username"
                   type="text"
                   required
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  className="peer w-full rounded-lg border-2 border-gray-300 bg-transparent p-2.5 text-base outline-none focus:border-b-4 focus:border-custom-brown focus:border-b-custom-brown"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="peer w-full rounded-lg border-2 border-gray-300 bg-transparent p-2 text-base outline-none focus:border-b-4 focus:border-custom-brown focus:border-b-custom-brown"
                 />
                 <label
-                  htmlFor="firstName"
-                  className={`pointer-events-none absolute left-0 m-1 ml-2.5 transform bg-white p-1.5 text-base text-gray-500 transition-transform duration-300 ease-in-out peer-focus:ml-5 peer-focus:-translate-y-[70%] peer-focus:scale-90 peer-focus:px-1 peer-focus:py-0 peer-focus:text-custom-brown ${firstName ? "ml-5 translate-y-[-70%] scale-90 px-1 py-0" : ""}`}
+                  htmlFor="username"
+                  className={`pointer-events-none absolute left-0 m-1 ml-2.5 transform bg-white p-1.5 text-base text-gray-500 transition-transform duration-300 ease-in-out peer-focus:ml-5 peer-focus:-translate-y-[70%] peer-focus:scale-90 peer-focus:px-1 peer-focus:py-0 peer-focus:text-custom-brown ${username ? "ml-5 translate-y-[-70%] scale-90 px-1 py-0" : ""}`}
                 >
-                  First Name
+                  Username
                 </label>
               </div>
-              <div className="relative font-sans">
-                <input
-                  name="lastName"
-                  id="lastName"
-                  type="text"
-                  required
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  className="peer w-full rounded-lg border-2 border-gray-300 bg-transparent p-2.5 text-base outline-none focus:border-b-4 focus:border-custom-brown focus:border-b-custom-brown"
-                />
-                <label
-                  htmlFor="lastName"
-                  className={`pointer-events-none absolute left-0 m-1 ml-2.5 transform bg-white p-1.5 text-base text-gray-500 transition-transform duration-300 ease-in-out peer-focus:ml-5 peer-focus:-translate-y-[70%] peer-focus:scale-90 peer-focus:px-1 peer-focus:py-0 peer-focus:text-custom-brown ${lastName ? "ml-5 translate-y-[-70%] scale-90 px-1 py-0" : ""}`}
-                >
-                  Last Name
-                </label>
-              </div>
-            </div>
             <div className="relative my-4  font-sans">
                 <input
                   name="email"
@@ -148,7 +122,7 @@ const SignupPage = () => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="peer w-full rounded-lg border-2 border-gray-300 bg-transparent p-2.5 text-base outline-none focus:border-b-4 focus:border-custom-brown focus:border-b-custom-brown"
+                  className="peer w-full rounded-lg border-2 border-gray-300 bg-transparent p-2 text-base outline-none focus:border-b-4 focus:border-custom-brown focus:border-b-custom-brown"
                 />
                 <label
                   htmlFor="email"
@@ -165,7 +139,7 @@ const SignupPage = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="peer w-full rounded-lg border-2 border-gray-300 bg-transparent p-2.5 text-base outline-none focus:border-b-4 focus:border-custom-brown focus:border-b-custom-brown"
+                  className="peer w-full rounded-lg border-2 border-gray-300 bg-transparent p-2 text-base outline-none focus:border-b-4 focus:border-custom-brown focus:border-b-custom-brown"
                 />
                 <label
                   htmlFor="password"
@@ -182,7 +156,7 @@ const SignupPage = () => {
                   required
                   value={reenterPassword}
                   onChange={(e) => setReenterPassword(e.target.value)}
-                  className="peer w-full rounded-lg border-2 border-gray-300 bg-transparent p-2.5 text-base outline-none focus:border-b-4 focus:border-custom-brown focus:border-b-custom-brown"
+                  className="peer w-full rounded-lg border-2 border-gray-300 bg-transparent p-2 text-base outline-none focus:border-b-4 focus:border-custom-brown focus:border-b-custom-brown"
                 />
                 <label
                   htmlFor="reenterpassword"
