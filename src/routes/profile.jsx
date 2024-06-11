@@ -1,34 +1,35 @@
 import { useState, useEffect } from "react";
-import VideoGallery from "./videopage";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { getAuth } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase-config"; // Adjust the import path as needed
+import VideoGallery from "./videopage";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faFacebook,
-  faTwitter,
-  faYoutube,
-  faTiktok,
-} from "@fortawesome/free-brands-svg-icons";
+import { faFacebook, faTwitter, faYoutube, faTiktok } from "@fortawesome/free-brands-svg-icons";
 import { faUserEdit } from "@fortawesome/free-solid-svg-icons";
 import SubscriptionModal from "../components/subscriptionmodal";
 
 export default function Profile() {
-  // STATE VARIABLES
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(1);
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
+  const navigate = useNavigate();
+  const { userId } = useParams(); // Get the user ID from the URL parameters
+  const [isProfileOwner, setIsProfileOwner] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null); // To store current user data
 
-  // Fetch user data from Firestore
   useEffect(() => {
     const fetchUserData = async () => {
       const auth = getAuth();
       const user = auth.currentUser;
+      setCurrentUser(user);
 
       if (user) {
-        const userDocRef = doc(db, "users", user.uid);
+        const isOwner = userId ? userId === user.uid : true;
+        setIsProfileOwner(isOwner);
+
+        const userDocRef = doc(db, "users", userId || user.uid);
         try {
           const userDoc = await getDoc(userDocRef);
           if (userDoc.exists()) {
@@ -37,37 +38,32 @@ export default function Profile() {
         } catch (error) {
           console.error("Error fetching user data: ", error);
         }
-        setLoading(false);
       }
+      setLoading(false);
     };
 
     fetchUserData();
-  }, []);
+  }, [userId]);
 
-  // Handle tab click
   const handleTabClick = (tabNumber) => {
     setActiveTab(tabNumber);
   };
 
-  // Determine which content to display based on the active tab
   const getTabContent = () => {
     switch (activeTab) {
       case 1:
         return (
           <div className="p-4 text-center">
-            This will be like a social media style feed where the creators post
-            are
+            This will be like a social media style feed where the creators post are
             <VideoGallery />
           </div>
         );
       case 2:
         return (
           <div className="p-4 text-center">
-            This will be the CookBook where the creators recipes are. You have
-            to subscribe to see.
+            This will be the CookBook where the creators recipes are. You have to subscribe to see.
           </div>
         );
-      
       default:
         return <div className="p-4 text-center">Content for Tab 1</div>;
     }
@@ -77,14 +73,33 @@ export default function Profile() {
     return <div>Loading...</div>;
   }
 
+  if (userData && userData.chef === false && isProfileOwner) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+        <h1 className="text-2xl font-bold mb-4">Become a Chef</h1>
+        <p className="mb-4 text-center text-lg text-gray-700">
+          Sign up to be a chef and share your amazing recipes with the world!
+        </p>
+        <button
+          onClick={() => navigate("/chef-signup")}
+          className="px-4 py-2 bg-custom-brown text-white rounded-md hover:bg-custom-brown-dark transition"
+        >
+          Sign Up to be a Chef
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="mt-12 flex min-h-screen w-full flex-col items-center">
       <div className="aspect-[10/4] w-full">
         <div className="h-full w-full">
           <div className="relative flex h-full w-full">
-            <Link to="/editprofile" className="absolute right-2 top-2 z-20 rounded-full bg-white p-2 text-custom-brown">
-        <FontAwesomeIcon icon={faUserEdit} className="text-custom-brown" />
-      </Link>
+            {isProfileOwner && (
+              <Link to="/editprofile" className="absolute right-2 top-2 z-20 rounded-full bg-white p-2 text-custom-brown">
+                <FontAwesomeIcon icon={faUserEdit} className="text-custom-brown" />
+              </Link>
+            )}
             <img
               src={userData.coverPhoto}
               className="absolute h-full w-full object-cover"
@@ -93,7 +108,7 @@ export default function Profile() {
             <div className="z-10 flex w-[30%] items-center justify-center">
               <img
                 src={userData.profilePic}
-                className=" aspect-[1/1] w-[80%] rounded-full border-2 border-white"
+                className="aspect-[1/1] w-[80%] rounded-full border-2 border-white"
                 alt="Profile"
               />
             </div>
@@ -104,7 +119,7 @@ export default function Profile() {
                   {userData.firstName} {userData.lastName}
                 </p>
                 <p className="text-sm font-normal md:text-lg">
-                  {userData.firstName} {userData.Categories}
+                  {userData.categories}
                 </p>
               </div>
             </div>
@@ -127,12 +142,16 @@ export default function Profile() {
             <FontAwesomeIcon icon={faTiktok} className="text-white" />
           </div>
         </div>
-        <button onClick={() => setIsSubscriptionModalOpen(true)} className="flex items-center justify-center rounded bg-custom-brown p-1 text-center text-white">
-          + Subscribe
-        </button>
+        {!isProfileOwner && (
+          <button
+            onClick={() => setIsSubscriptionModalOpen(true)}
+            className="flex items-center justify-center rounded bg-custom-brown p-1 text-center text-white"
+          >
+            + Subscribe
+          </button>
+        )}
       </div>
       
-      {/* Tabs Section */}
       <div className="flex w-full items-center justify-around bg-white px-4 py-2 shadow-lg">
         <div
           onClick={() => handleTabClick(1)}
@@ -150,11 +169,15 @@ export default function Profile() {
             Cookbook
           </p>
         </div>
-        
       </div>
-      {/* Dynamic Content Based on Active Tab */}
+      
       {getTabContent()}
-      <SubscriptionModal isModalOpen={isSubscriptionModalOpen} closeModal={() => setIsSubscriptionModalOpen(false)} />
+      <SubscriptionModal
+        isModalOpen={isSubscriptionModalOpen}
+        closeModal={() => setIsSubscriptionModalOpen(false)}
+        profileUserId={userId} // Pass the profile user ID
+        currentUserId={currentUser?.uid} // Pass the current user ID
+      />
     </div>
   );
 }

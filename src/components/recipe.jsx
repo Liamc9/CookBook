@@ -1,15 +1,18 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useSwipeable } from 'react-swipeable';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { db } from "../firebase-config";
 import { doc, getDoc } from "firebase/firestore";
 import { FaArrowUp, FaArrowDown, FaPlay, FaPause } from "react-icons/fa";
+import debounce from 'lodash.debounce';
 
-const SwipeableRecipeViewer = ({ recipeId }) => {
+const RecipeViewer = ({ recipeId }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [recipeData, setRecipeData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showIngredients, setShowIngredients] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [dragStartX, setDragStartX] = useState(null);
+  const [dragging, setDragging] = useState(false);
+  const carouselRef = useRef(null);
   const videoRef = useRef(null);
 
   useEffect(() => {
@@ -33,24 +36,69 @@ const SwipeableRecipeViewer = ({ recipeId }) => {
     fetchRecipeData();
   }, [recipeId]);
 
-  const handleSwipeLeft = () => {
+  const handleDragStart = (event) => {
+    setDragStartX(event.clientX || event.touches[0].clientX);
+    setDragging(true);
+  };
+
+  const handleDragEnd = (event) => {
+    if (dragStartX !== null) {
+      const dragEndX = event.clientX || (event.changedTouches && event.changedTouches[0].clientX);
+      const dragDistance = dragStartX - dragEndX;
+
+      if (dragDistance > 50) {
+        handleNextStep();
+      } else if (dragDistance < -50) {
+        handlePreviousStep();
+      }
+
+      setDragStartX(null);
+      setDragging(false);
+      snapToCurrentStep();
+    }
+  };
+
+  const snapToCurrentStep = useCallback(debounce(() => {
+    if (carouselRef.current) {
+      const stepWidth = carouselRef.current.clientWidth;
+      const scrollPosition = carouselRef.current.scrollLeft;
+      const newStep = Math.round(scrollPosition / stepWidth);
+      setCurrentStep(newStep);
+      const scrollTo = stepWidth * newStep;
+      carouselRef.current.scrollTo({ left: scrollTo, behavior: 'smooth' });
+    }
+  }, 100), []);
+
+  useEffect(() => {
+    if (!dragging) {
+      snapToCurrentStep();
+    }
+  }, [currentStep, dragging, snapToCurrentStep]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      snapToCurrentStep();
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [snapToCurrentStep]);
+
+  const handleNextStep = () => {
     if (recipeData && recipeData.steps && currentStep < recipeData.steps.length) {
       setCurrentStep(currentStep + 1);
-      setShowIngredients(false); // Hide ingredients when swiping
+      setShowIngredients(false);
     }
   };
 
-  const handleSwipeRight = () => {
+  const handlePreviousStep = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
-      setShowIngredients(false); // Hide ingredients when swiping
+      setShowIngredients(false);
     }
   };
-
-  const handlers = useSwipeable({
-    onSwipedLeft: handleSwipeLeft,
-    onSwipedRight: handleSwipeRight,
-  });
 
   const togglePlayPause = () => {
     if (videoRef.current) {
@@ -103,7 +151,7 @@ const SwipeableRecipeViewer = ({ recipeId }) => {
         {renderOverlayButton()}
       </div>
       <div className={`absolute bottom-0 left-0 w-full h-[400px] bg-white p-4 border-t rounded-t-lg transition-transform transform ${showIngredients ? 'translate-y-[20%]' : 'translate-y-[100%]'} z-10`}>
-        <div className="flex justify-between items-center ">
+        <div className="flex justify-between items-center">
           <h3 className="text-xl font-bold">Ingredients</h3>
           <button onClick={toggleIngredientsDrawer} className="focus:outline-none">
             {showIngredients ? <FaArrowDown /> : <FaArrowUp />}
@@ -122,8 +170,7 @@ const SwipeableRecipeViewer = ({ recipeId }) => {
 
   const renderStepPage = (step, stepIndex) => (
     <div key={stepIndex} className="relative border rounded-lg shadow-lg bg-white max-w-md mx-auto z-50 h-[90%]">
-            <h2 className="text-2xl font-bold mb-4">Step {stepIndex + 1}</h2>
-
+      <h2 className="text-2xl font-bold mb-4">Step {stepIndex + 1}</h2>
       <div className="relative">
         {step.stepUrl && (
           <video
@@ -135,8 +182,8 @@ const SwipeableRecipeViewer = ({ recipeId }) => {
         )}
         {renderOverlayButton()}
       </div>
-       <div className={`absolute bottom-0 left-0 w-full h-[400px] bg-white p-4 border-t rounded-t-lg transition-transform transform ${showIngredients ? 'translate-y-[20%]' : 'translate-y-[100%]'} z-10`}>
-        <div className="flex justify-between items-center ">
+      <div className={`absolute bottom-0 left-0 w-full h-[400px] bg-white p-4 border-t rounded-t-lg transition-transform transform ${showIngredients ? 'translate-y-[20%]' : 'translate-y-[100%]'} z-10`}>
+        <div className="flex justify-between items-center">
           <h3 className="text-xl font-bold">Descriptions</h3>
           <button onClick={toggleIngredientsDrawer} className="focus:outline-none">
             {showIngredients ? <FaArrowDown /> : <FaArrowUp />}
@@ -147,24 +194,30 @@ const SwipeableRecipeViewer = ({ recipeId }) => {
     </div>
   );
 
-  const renderCurrentPage = () => {
-    if (currentStep === 0) {
-      return renderOverviewPage();
-    }
-
-    const step = recipeData.steps[currentStep - 1];
-    if (step) {
-      return renderStepPage(step, currentStep - 1);
-    }
-
-    return <div className="flex items-center justify-center h-screen">No more steps available</div>;
-  };
-
   return (
-    <div {...handlers} className="h-screen overflow-hidden bg-gray-100">
-      {renderCurrentPage()}
+    <div className="h-screen overflow-hidden bg-gray-100 flex flex-col items-center">
+      <div
+        ref={carouselRef}
+        className="flex overflow-x-auto no-scrollbar w-full max-w-md mx-auto"
+        onMouseDown={handleDragStart}
+        onMouseMove={(e) => e.preventDefault()}
+        onMouseUp={handleDragEnd}
+        onMouseLeave={() => setDragStartX(null)}
+        onTouchStart={(e) => handleDragStart(e)}
+        onTouchMove={(e) => e.preventDefault()}
+        onTouchEnd={(e) => handleDragEnd(e)}
+      >
+        <div className="flex-shrink-0 w-full">
+          {renderOverviewPage()}
+        </div>
+        {recipeData.steps.map((step, index) => (
+          <div key={index} className="flex-shrink-0 w-full">
+            {renderStepPage(step, index)}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
 
-export default SwipeableRecipeViewer;
+export default RecipeViewer;

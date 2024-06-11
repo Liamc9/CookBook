@@ -16,12 +16,25 @@ export default function Subscribinglist() {
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-        const userDoc = await getDoc(doc(db, "users", 'LzWLxrHTYQ3CBRt4fx4S'));
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          setSubscribingIds(userData.subscribing || []);
-          console.log('uvuy',userData.subscribing);
+      if (user) {
+        try {
+          // Get the user document from Firestore
+          const userDocRef = doc(db, "users", user.uid);
+          const userDoc = await getDoc(userDocRef);
+          
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            // Set subscribing IDs from user data
+            setSubscribingIds(userData.subscribing || []);
+          } else {
+            console.error("No such document!");
+          }
+        } catch (error) {
+          console.error("Error fetching user document:", error);
         }
+      } else {
+        console.error("User is not logged in");
+      }
       setLoading(false);
     });
 
@@ -39,8 +52,8 @@ export default function Subscribinglist() {
       <div className="mt-20 mx-auto w-[90%]">
         <Search />
         
-        <div className=" mt-10 flex h-screen flex-col gap-4  ">
-        <h1 className=" text-xl font-bold">Subscribed</h1>
+        <div className="mt-10 flex h-screen flex-col gap-4">
+          <h1 className="text-xl font-bold">Subscribed</h1>
           {subscribingIds.length > 0 ? (
             subscribingIds.map((chefid) => (
               <Chefcard key={chefid} chefid={chefid} />

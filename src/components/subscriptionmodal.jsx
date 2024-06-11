@@ -1,31 +1,51 @@
-// IMPORTS
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faX } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
+import { doc, updateDoc, arrayUnion } from "firebase/firestore";
+import { db } from "../firebase-config"; // Adjust the import path as needed
 
-// CREATE FUNCTION
-export default function SubscriptionModal({ isModalOpen, closeModal }) {
-  // STATE VARIABLES
-  const [state, setState] = useState('');
-
-  // JAVASCRIPT LOGIC
+export default function SubscriptionModal({ isModalOpen, closeModal, profileUserId, currentUserId }) {
   useEffect(() => {
-    // Lock body scroll when modal is open
     if (isModalOpen) {
       document.body.style.overflow = "hidden";
     }
-    // Re-enable body scroll when modal is closed
     return () => {
       document.body.style.overflow = "";
     };
-  }, [isModalOpen]); // Dependency array ensures effect runs only when `isModalOpen` changes
+  }, [isModalOpen]);
 
   if (!isModalOpen) return null;
 
+  const handleSubscribe = async () => {
+    if (!profileUserId || !currentUserId) {
+      alert("Invalid user information.");
+      return;
+    }
+
+    try {
+      // Add the profile user ID to the current user's subscribing array
+      const currentUserDocRef = doc(db, "users", currentUserId);
+      await updateDoc(currentUserDocRef, {
+        subscribing: arrayUnion(profileUserId),
+      });
+
+      // Add the current user ID to the profile user's subscribers array
+      const profileUserDocRef = doc(db, "users", profileUserId);
+      await updateDoc(profileUserDocRef, {
+        subscribers: arrayUnion(currentUserId),
+      });
+
+      alert("Subscribed successfully!");
+      closeModal();
+    } catch (error) {
+      console.error("Error subscribing: ", error);
+      alert("An error occurred while subscribing. Please try again.");
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className={`rounded-lg bg-white shadow-lg h-[400px] w-[400px]`}> {/* CHANGE THE HEIGHT AND WIDTH OF MODAL HERE */}
+      <div className="rounded-lg bg-white shadow-lg h-[400px] w-[400px]">
         <div className="relative">
           <button
             onClick={closeModal}
@@ -34,27 +54,14 @@ export default function SubscriptionModal({ isModalOpen, closeModal }) {
             <FontAwesomeIcon icon={faX} />
           </button>
           <div className="m-8 my-4 md:my-8 md:mt-4">
-            <div>
             <div className="mb-[200px] flex w-full flex-col gap-4 p-4 text-center">
-            <div className="rounded-lg border border-gray-300 p-4">
-              <p className="mb-2">Subscribe for free</p>
-              <Link
-                to="/pricing"
-                className="rounded-lg bg-custom-brown px-4 py-2 text-sm text-white hover:text-custom-brown"
+              <p className="mb-4 text-lg font-semibold">Subscribe to get the latest updates!</p>
+              <button
+                onClick={handleSubscribe}
+                className="rounded-lg bg-custom-brown px-4 py-2 text-sm text-white hover:bg-custom-brown-dark transition"
               >
-                Subscribe Free
-              </Link>
-            </div>
-            <div className="rounded-lg border border-gray-300 p-4">
-              <p className="mb-2">Get the exclusive subscription</p>
-              <Link
-                to="/pricing"
-                className="rounded-lg bg-custom-brown px-4 py-2 text-sm text-white hover:text-custom-brown"
-              >
-                Subscribe $10
-              </Link>
-            </div>
-          </div>
+                Subscribe for Free
+              </button>
             </div>
           </div>
         </div>

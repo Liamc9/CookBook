@@ -10,13 +10,14 @@ import CreatorsPage from './routes/creatorspage'
 import Mycookbook from './routes/mycookbook'
 import Profile from './routes/profile'
 import Subscribinglist from './routes/subscribinglist'
-import Addrecipe from './routes/addrecipe'
+import AddRecipe from './routes/addRecipe/addRecipe'
 import ImageGallery from './routes/imagepage'
 import VideoGallery from './routes/videopage'
 import Videoscroll from './routes/videoscroll'
 import Recipeviewer from './components/creatorcard'
 import Chefcard from './components/chefcard'
 import Editprofile from './routes/editprofile'
+import ChefSignup from './routes/chefSignup'
 
 const router = createBrowserRouter([
     {
@@ -40,7 +41,7 @@ const router = createBrowserRouter([
                 element: <Feed />,
             },
             {
-                path: 'profile',
+                path: '/profile/:userId',
                 element: <Profile />,
             },
             {
@@ -53,7 +54,7 @@ const router = createBrowserRouter([
             },
             {
                 path: 'addrecipe',
-                element: <Addrecipe />,
+                element: <AddRecipe />,
             },
             {
                 path: "creatorspage/:id",
@@ -84,6 +85,10 @@ const router = createBrowserRouter([
                 path: "editprofile",
                 element: <Editprofile />,
                 },
+                {
+                    path: "chefSignup",
+                    element: <ChefSignup />,
+                }
         ],
     },
 ])

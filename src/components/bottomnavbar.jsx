@@ -1,37 +1,68 @@
-// IMPORTS
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faNewspaper, faPlusSquare, faBookOpen, faUser } from '@fortawesome/free-solid-svg-icons';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { useState, useEffect } from 'react';
 
-// CREATE FUNCTION
 export default function BottomNavbar() {
-   
-    // HTML
+    const [userId, setUserId] = useState(null);
+
+    useEffect(() => {
+        const auth = getAuth();
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                setUserId(user.uid);
+            } else {
+                setUserId(null);
+            }
+        });
+        // Clean up the subscription on unmount
+        return () => unsubscribe();
+    }, []);
+
     return (
-        <>
-            <head></head>
-            <body>
-            <div className="fixed inset-x-0 bottom-0 bg-white shadow-md z-30">
-            <hr></hr>
-            <div className="flex text-sm">
-                <Link to="/feed" className="tab flex-1 text-center p-2 text-gray-700 hover:text-custom-brown hover:bg-gray-100 cursor-pointer">
-                    <FontAwesomeIcon icon={faHome} /> Feed
+        <div className="fixed inset-x-0 bottom-0 bg-white shadow-md z-30">
+            <div className="flex justify-around text-sm py-2">
+                <Link to="/feed" className="flex-1 text-center text-gray-700 hover:text-custom-brown transition duration-300 ease-in-out">
+                    <div className="flex flex-col items-center">
+                        <FontAwesomeIcon icon={faHome} size="lg" />
+                        <span className="mt-1">Feed</span>
+                    </div>
                 </Link>
-                <Link to="/subscribing" className="tab flex-1 text-center p-2 text-gray-700 hover:text-custom-brown hover:bg-gray-100 cursor-pointer">
-                    <FontAwesomeIcon icon={faNewspaper} /> Subscribing
+                <Link to="/subscribing" className="flex-1 text-center text-gray-700 hover:text-custom-brown transition duration-300 ease-in-out">
+                    <div className="flex flex-col items-center">
+                        <FontAwesomeIcon icon={faNewspaper} size="lg" />
+                        <span className="mt-1">Subscribing</span>
+                    </div>
                 </Link>
-                <Link to="/addrecipe" className="tab flex-1 text-center p-2 text-gray-500 hover:text-custom-brown text-4xl hover:bg-gray-100 cursor-pointer">
-                    <FontAwesomeIcon icon={faPlusSquare} />
+                <Link to="/addrecipe" className="flex-1 text-center text-gray-700 hover:text-custom-brown transition duration-300 ease-in-out">
+                    <div className="relative flex flex-col items-center">
+                        <FontAwesomeIcon icon={faPlusSquare} size="2x" className="text-4xl text-custom-brown hover:text-custom-brown-dark" />
+                        <span className="mt-1 hidden">Add Recipe</span>
+                    </div>
                 </Link>
-                <Link to="/mycookbook" className="tab flex-1 text-center p-2 text-gray-700 hover:text-custom-brown hover:bg-gray-100 cursor-pointer">
-                    <FontAwesomeIcon icon={faBookOpen} /> My Cookbook
+                <Link to="/mycookbook" className="flex-1 text-center text-gray-700 hover:text-custom-brown transition duration-300 ease-in-out">
+                    <div className="flex flex-col items-center">
+                        <FontAwesomeIcon icon={faBookOpen} size="lg" />
+                        <span className="mt-1">Cookbook</span>
+                    </div>
                 </Link>
-                <Link to="/profile" className="tab flex-1 text-center p-2 text-gray-700 hover:text-custom-brown hover:bg-gray-100 cursor-pointer">
-                    <FontAwesomeIcon icon={faUser} /> Profile
-                </Link>
+                {userId ? (
+                    <Link to={`/profile/${userId}`} className="flex-1 text-center text-gray-700 hover:text-custom-brown transition duration-300 ease-in-out">
+                        <div className="flex flex-col items-center">
+                            <FontAwesomeIcon icon={faUser} size="lg" />
+                            <span className="mt-1">Profile</span>
+                        </div>
+                    </Link>
+                ) : (
+                    <div className="flex-1 text-center text-gray-400">
+                        <div className="flex flex-col items-center">
+                            <FontAwesomeIcon icon={faUser} size="lg" />
+                            <span className="mt-1">Profile</span>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
-            </body>
-        </>
-    )
+    );
 }
