@@ -2,48 +2,45 @@
 import { useState, useEffect } from "react";
 import { db } from "../firebase-config";
 import { collection, getDocs } from "firebase/firestore";
-import FeedCard from "../components/feedcard";
-
+import {CookbookCard} from 'liamc9npm'
 
 
 // CREATE FUNCTION
 export default function Feed() {
   // STATE VARIABLES
-  const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [recipe, setRecipeData] = useState([]);
 
-  useEffect(() => {
-    const fetchVideos = async () => {
-      setLoading(true);
-      const videoSnapshot = await getDocs(collection(db, "files"));
-      const videoList = videoSnapshot.docs.map((doc) => {
-        return { id: doc.id, ...doc.data() };
-      });
-      setVideos(videoList);
-      setLoading(false);
-    };
+ 
+    
+    
+      useEffect(() => {
+        const fetchRecipeData = async () => {
+          const querySnapshot = await getDocs(collection(db, 'recipes'));
+          let fetchedRecipes = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setRecipeData(fetchedRecipes);
+        };
+        fetchRecipeData();
+      }, []);
+    
 
-    fetchVideos();
-  }, []);
-  // HTML
   return (
     <>
       <head></head>
-      <body>
-        <div className="p-4 mt-20 overflow-y-scroll">
+      <body className="flex flex-col justify-center items-center h-screen my-20">
+        <div className="flex w-[500px] items-center ">
           {loading ? (
             <p>Loading videos...</p>
           ) : (
             <div className="flex h-screen flex-col gap-4 ">
-              {videos.map((video) => (
-                <div
-                  key={video.id}
-                  className=""
-                >
-                              <FeedCard name= "John Doe" caption="This is a caption" video={video.url}/>
-               
-                </div>
-              ))}
+              {recipe.map((recipe) => (
+                <CookbookCard title = {recipe.title} imageUrl = {recipe.imageUrl} videoUrl = {recipe.videoUrl} chef = {recipe.chef} time = {recipe.time} cuisine = {recipe.cuisine} likes = {recipe.likes} profilePic = {recipe.profilePic} />
+              ))
+              }
+              
             </div>
           )}
         </div>
