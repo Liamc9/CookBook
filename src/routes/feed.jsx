@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { db } from "../firebase-config";
 import { collection, getDocs } from "firebase/firestore";
 import CookbookCard from '../components/CookbookCard'
-
+import { RecipeCard } from 'liamc9npm'
 
 // CREATE FUNCTION
 export default function Feed() {
@@ -37,7 +37,7 @@ export default function Feed() {
           ) : (
             <div className="flex flex-col gap-4 ">
               {recipe.map((recipe) => (
-                <CookbookCard recipe={recipe} key={recipe.id} />
+                <RecipeCard recipe={recipe} key={recipe.id} />
               ))
               }
               

@@ -3,12 +3,11 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { getAuth } from "firebase/auth";
 import { doc, getDoc, getDocs, collection, query, where } from "firebase/firestore";
 import { db } from "../firebase-config"; // Adjust the import path as needed
-import CookbookCard from "../components/CookbookCard"; // Import your CookbookCard component
+import {RecipeCard, CookbookCard} from "liamc9npm"; // Import your CookbookCard component
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFacebook, faTwitter, faYoutube, faTiktok } from "@fortawesome/free-brands-svg-icons";
 import { faUserEdit } from "@fortawesome/free-solid-svg-icons";
 import SubscriptionModal from "../components/subscriptionmodal";
-import CookbooksCard from "../components/CookbooksCard";
 
 export default function Profile() {
   const [userData, setUserData] = useState(null);
@@ -100,7 +99,7 @@ console.log(cookbooks)
           <div className="p-4 text-center">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {recipes.map(recipe => (
-                <CookbookCard key={recipe.id} recipe={recipe} />
+                <RecipeCard key={recipe.id} recipe={recipe} />
               ))}
             </div>
           </div>
@@ -110,10 +109,10 @@ console.log(cookbooks)
           <div className="p-4 text-center">
 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {cookbooks.map(cookbook => (
-                <CookbooksCard key={cookbook.id} cookbook={cookbook} />
+                <CookbookCard key={cookbook.id} cookbook={cookbook} />
               ))}
             </div>          </div>
-        );
+        ); 
       default:
         return <div className="p-4 text-center">Content for Tab 1</div>;
     }
