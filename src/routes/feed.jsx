@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { db } from "../firebase-config";
 import { collection, getDocs } from "firebase/firestore";
-import {CookbookCard} from 'liamc9npm'
+import CookbookCard from '../components/CookbookCard'
 
 
 // CREATE FUNCTION
@@ -30,14 +30,14 @@ export default function Feed() {
   return (
     <>
       <head></head>
-      <body className="flex flex-col justify-center items-center h-screen my-20">
-        <div className="flex w-[500px] items-center ">
+      <body className="flex flex-col justify-center items-center my-20">
+        <div className="flex items-center ">
           {loading ? (
             <p>Loading videos...</p>
           ) : (
-            <div className="flex h-screen flex-col gap-4 ">
+            <div className="flex flex-col gap-4 ">
               {recipe.map((recipe) => (
-                <CookbookCard title = {recipe.title} imageUrl = {recipe.imageUrl} videoUrl = {recipe.videoUrl} chef = {recipe.chef} time = {recipe.time} cuisine = {recipe.cuisine} likes = {recipe.likes} profilePic = {recipe.profilePic} />
+                <CookbookCard recipe={recipe} key={recipe.id} />
               ))
               }
               

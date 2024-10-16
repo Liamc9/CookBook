@@ -1,19 +1,22 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getAuth } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, getDocs, collection, query, where } from "firebase/firestore";
 import { db } from "../firebase-config"; // Adjust the import path as needed
-import VideoGallery from "./videopage";
+import CookbookCard from "../components/CookbookCard"; // Import your CookbookCard component
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFacebook, faTwitter, faYoutube, faTiktok } from "@fortawesome/free-brands-svg-icons";
 import { faUserEdit } from "@fortawesome/free-solid-svg-icons";
 import SubscriptionModal from "../components/subscriptionmodal";
+import CookbooksCard from "../components/CookbooksCard";
 
 export default function Profile() {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(1);
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
+  const [recipes, setRecipes] = useState([]);
+  const [cookbooks, setCookbooks] = useState([]);
   const navigate = useNavigate();
   const { userId } = useParams(); // Get the user ID from the URL parameters
   const [isProfileOwner, setIsProfileOwner] = useState(false);
@@ -33,8 +36,13 @@ export default function Profile() {
         try {
           const userDoc = await getDoc(userDocRef);
           if (userDoc.exists()) {
-            setUserData(userDoc.data());
+            const data = userDoc.data();
+            setUserData(data);
+            await fetchRecipes(data.Recipes || []);
+            await fetchCookbooks(data.cookbooks || []);
+            console.log(data)
           }
+          console.log(userData)
         } catch (error) {
           console.error("Error fetching user data: ", error);
         }
@@ -42,9 +50,45 @@ export default function Profile() {
       setLoading(false);
     };
 
+    const fetchRecipes = async (Recipes) => {
+      if (Recipes.length === 0) return;
+
+      const recipesRef = collection(db, "recipes");
+      const recipesQuery = query(recipesRef, where("__name__", "in", Recipes));
+
+      try {
+        const recipeDocs = await getDocs(recipesQuery);
+        const fetchedRecipes = recipeDocs.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setRecipes(fetchedRecipes);
+      } catch (error) {
+        console.error("Error fetching recipes: ", error);
+      }
+    };
+
+    const fetchCookbooks = async (Cookbooks) => {
+      if (Cookbooks.length === 0) return;
+
+      const cookbooksRef = collection(db, "cookbooks");
+      const cookbooksQuery = query(cookbooksRef, where("__name__", "in", Cookbooks));
+
+      try {
+        const cookbooksDocs = await getDocs(cookbooksQuery);
+        const fetchedCookbooks = cookbooksDocs.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setCookbooks(fetchedCookbooks);
+      } catch (error) {
+        console.error("Error fetching cookbooks: ", error);
+      }
+    };
+
     fetchUserData();
   }, [userId]);
-
+console.log(cookbooks)
   const handleTabClick = (tabNumber) => {
     setActiveTab(tabNumber);
   };
@@ -54,15 +98,21 @@ export default function Profile() {
       case 1:
         return (
           <div className="p-4 text-center">
-            This will be like a social media style feed where the creators post are
-            <VideoGallery />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {recipes.map(recipe => (
+                <CookbookCard key={recipe.id} recipe={recipe} />
+              ))}
+            </div>
           </div>
         );
       case 2:
         return (
           <div className="p-4 text-center">
-            This will be the CookBook where the creators recipes are. You have to subscribe to see.
-          </div>
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {cookbooks.map(cookbook => (
+                <CookbooksCard key={cookbook.id} cookbook={cookbook} />
+              ))}
+            </div>          </div>
         );
       default:
         return <div className="p-4 text-center">Content for Tab 1</div>;
@@ -91,7 +141,8 @@ export default function Profile() {
   }
 
   return (
-    <div className="mt-12 flex min-h-screen w-full flex-col items-center">
+    <div className="relative mt-12 mb-20 flex min-h-screen w-full flex-col items-center">
+      {/* Profile and cover image */}
       <div className="aspect-[10/4] w-full">
         <div className="h-full w-full">
           <div className="relative flex h-full w-full">
@@ -117,61 +168,79 @@ export default function Profile() {
               <div className="z-20 flex flex-col text-lg font-semibold text-white md:text-xl">
                 <p>
                   {userData.firstName} {userData.lastName}
+                  {userData.name}
                 </p>
-                <p className="text-sm font-normal md:text-lg">
+                <p className="text-sm font-normal md:text-lg mb-2">
                   {userData.categories}
                 </p>
+                {/* Social and subscription */}
+        <div className=" absolute bottom-2 right-2 flex flex-row gap-2 ">
+          <div className="px-1 bg-blue-500 items-center justify-center rounded">
+            <FontAwesomeIcon icon={faFacebook} className="text-white" />
+          </div>
+          <div className="px-1 bg-blue-300 items-center justify-center rounded">
+            <FontAwesomeIcon icon={faTwitter} className="text-white" />
+          </div>
+          <div className="px-1 bg-red-500 items-center justify-center rounded">
+            <FontAwesomeIcon icon={faYoutube} className="text-white" />
+          </div>
+          <div className="px-1 bg-black items-center justify-center rounded">
+            <FontAwesomeIcon icon={faTiktok} className="text-white" />
+          </div>
+        </div>
+        
               </div>
             </div>
             <div className="absolute bottom-0 h-[50%] w-full bg-gray-500 opacity-50"></div>
           </div>
         </div>
-      </div>
-      <div className="flex w-full flex-row justify-between p-4">
-        <div className="flex flex-row gap-2">
-          <div className="p-1 bg-gray-500 items-center justify-center">
-            <FontAwesomeIcon icon={faFacebook} className="text-white" />
-          </div>
-          <div className="p-1 bg-gray-500 items-center justify-center">
-            <FontAwesomeIcon icon={faTwitter} className="text-white" />
-          </div>
-          <div className="p-1 bg-gray-500 items-center justify-center">
-            <FontAwesomeIcon icon={faYoutube} className="text-white" />
-          </div>
-          <div className="p-1 bg-gray-500 items-center justify-center">
-            <FontAwesomeIcon icon={faTiktok} className="text-white" />
-          </div>
-        </div>
         {!isProfileOwner && (
           <button
             onClick={() => setIsSubscriptionModalOpen(true)}
-            className="flex items-center justify-center rounded bg-custom-brown p-1 text-center text-white"
+            className="absolute top-2 right-2 flex items-center justify-center rounded bg-white p-1 text-center text-custom-brown shadow-md font-semibold"
           >
             + Subscribe
           </button>
         )}
       </div>
+
       
-      <div className="flex w-full items-center justify-around bg-white px-4 py-2 shadow-lg">
-        <div
-          onClick={() => handleTabClick(1)}
-          className="tab cursor-pointer text-center"
-        >
-          <p className="text-sm text-gray-700 hover:text-custom-brown">
-            My Feed
-          </p>
-        </div>
-        <div
-          onClick={() => handleTabClick(2)}
-          className="tab cursor-pointer text-center"
-        >
-          <p className="text-sm text-gray-700 hover:text-custom-brown">
-            Cookbook
-          </p>
-        </div>
-      </div>
-      
+
+      {/* Tabs */}
+<div className="flex w-full justify-center bg-white shadow-lg">
+  <div className="flex border-b border-gray-200 w-full">
+    <button
+      onClick={() => handleTabClick(1)}
+      className={`relative py-4 text-sm font-medium focus:outline-none transition duration-300 w-full ${
+        activeTab === 1
+          ? 'text-custom-brown'
+          : 'text-gray-500 hover:text-custom-brown'
+      }`}
+    >
+      All Recipes
+      {activeTab === 1 && (
+        <span className="absolute left-0 bottom-0 h-1 w-full bg-custom-brown animate-slideIn"></span>
+      )}
+    </button>
+    <button
+      onClick={() => handleTabClick(2)}
+      className={`relative py-4 text-sm font-medium focus:outline-none transition duration-300 w-full ${
+        activeTab === 2
+          ? 'text-custom-brown'
+          : 'text-gray-500 hover:text-custom-brown'
+      }`}
+    >
+      Cookbooks
+      {activeTab === 2 && (
+        <span className="absolute left-0 bottom-0 h-1 w-full bg-custom-brown animate-slideIn"></span>
+      )}
+    </button>
+  </div>
+</div>
+
+
       {getTabContent()}
+
       <SubscriptionModal
         isModalOpen={isSubscriptionModalOpen}
         closeModal={() => setIsSubscriptionModalOpen(false)}

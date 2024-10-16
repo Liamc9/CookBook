@@ -18,6 +18,7 @@ import Recipeviewer from './components/creatorcard'
 import Chefcard from './components/chefcard'
 import Editprofile from './routes/editprofile'
 import ChefSignup from './routes/chefSignup'
+import CookbookPage from './routes/CookbookPage'
 
 const router = createBrowserRouter([
     {
@@ -88,7 +89,11 @@ const router = createBrowserRouter([
                 {
                     path: "chefSignup",
                     element: <ChefSignup />,
-                }
+                },
+                {
+                    path: '/cookbooks/:cookbookId',
+                    element: <CookbookPage />,
+                },
         ],
     },
 ])

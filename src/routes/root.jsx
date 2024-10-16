@@ -1,32 +1,66 @@
+// Root.js
 import { Outlet, useLocation } from "react-router-dom";
 import NavBar from "../components/topnavbar";
 import BottomTabs from "../components/bottomnavbar";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import LoginPage from "./login";
+import { auth } from "../firebase-config";
 
 export default function Root() {
   const location = useLocation();
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Set up Firebase authentication state listener
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setUser(user); // Set user if authenticated
+      setLoading(false); // Stop loading once auth check is done
+    });
+
+    // Cleanup subscription when component unmounts
+    return () => unsubscribe();
+  }, []);
 
   // Scroll to top whenever the location.pathname changes
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
-
+  // Conditionally hide top navbar on specific paths
   const shouldHideTopNav = () => {
-    // List the paths where BottomTabs should be hidden
     const pathsToHide = ["/updatecarddetails"];
     return pathsToHide.includes(location.pathname);
   };
 
+  const shouldHideBottomNav = () => {
+    const pathsToHide = ["/updatecarddetails", "/profile"];
+    return pathsToHide.includes(location.pathname);
+  };
+
+  // Function to close the modal after login
+  const closeModal = () => {
+    // Modal will automatically close when user is authenticated
+  };
+
+  // Render a loading spinner while authentication is being checked
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  // Render the modal if the user is not authenticated
   return (
-    <>
-      <div className="min-h-screen overflow-y-auto overflow-x-hidden bg-white">
-        {" "}
-        {/* Think this is for the phone scroll */}
-        {!shouldHideTopNav() && <NavBar />}
-        <BottomTabs />
-        <Outlet />
-      </div>
-    </>
+    <div className="min-h-screen overflow-y-auto overflow-x-hidden bg-white">
+      {user ? (
+        <>
+          {!shouldHideTopNav() && <NavBar />}
+          <Outlet /> {/* Renders the current route's component */}
+          {!shouldHideBottomNav() && <BottomTabs />}
+          
+        </>
+      ) : (
+        <LoginPage closeModal={closeModal} />
+      )}
+    </div>
   );
 }
