@@ -19,6 +19,7 @@ import Chefcard from './components/chefcard'
 import Editprofile from './routes/editprofile'
 import ChefSignup from './routes/chefSignup'
 import CookbookPage from './routes/CookbookPage'
+import RecipeSwipePage from './routes/RecipeSwipePage'
 
 const router = createBrowserRouter([
     {
@@ -93,6 +94,10 @@ const router = createBrowserRouter([
                 {
                     path: '/cookbooks/:cookbookId',
                     element: <CookbookPage />,
+                },
+                {
+                    path: '/recipeswipepage/:docId',
+                    element: <RecipeSwipePage />,
                 },
         ],
     },

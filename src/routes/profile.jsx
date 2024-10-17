@@ -92,14 +92,19 @@ console.log(cookbooks)
     setActiveTab(tabNumber);
   };
 
+ 
   const getTabContent = () => {
     switch (activeTab) {
       case 1:
         return (
           <div className="p-4 text-center">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {recipes.map(recipe => (
-                <RecipeCard key={recipe.id} recipe={recipe} />
+              {recipes.map((recipe) => (
+                <RecipeCard
+                  key={recipe.id}
+                  recipe={recipe}
+                  onCardClick={() => navigate(`/recipeswipepage/${recipe.id}`)}
+                />
               ))}
             </div>
           </div>

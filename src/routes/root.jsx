@@ -29,13 +29,13 @@ export default function Root() {
 
   // Conditionally hide top navbar on specific paths
   const shouldHideTopNav = () => {
-    const pathsToHide = ["/updatecarddetails"];
-    return pathsToHide.includes(location.pathname);
+    const pathsToHide = ["/updatecarddetails", "/recipeswipepage"];
+    return pathsToHide.some((path) => location.pathname.startsWith(path));
   };
 
   const shouldHideBottomNav = () => {
-    const pathsToHide = ["/updatecarddetails", "/profile"];
-    return pathsToHide.includes(location.pathname);
+    const pathsToHide = ["/updatecarddetails", "/profile", "/recipeswipepage"];
+    return pathsToHide.some((path) => location.pathname.startsWith(path));
   };
 
   // Function to close the modal after login
@@ -56,7 +56,6 @@ export default function Root() {
           {!shouldHideTopNav() && <NavBar />}
           <Outlet /> {/* Renders the current route's component */}
           {!shouldHideBottomNav() && <BottomTabs />}
-          
         </>
       ) : (
         <LoginPage closeModal={closeModal} />
