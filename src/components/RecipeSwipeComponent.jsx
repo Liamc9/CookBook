@@ -14,12 +14,20 @@ const RecipeSwipeComponent = ({ recipe }) => {
     overviewVideoUrl,
     overviewDescription,
   } = recipe;
+
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [currentStepDescription, setCurrentStepDescription] = useState(overviewDescription);
+  const [isMuted, setIsMuted] = useState(false);
 
   const toggleDrawer = (description) => {
     setCurrentStepDescription(description);
     setIsDrawerOpen(!isDrawerOpen);
+  };
+
+  const closeDrawer = (e) => {
+    if (e.target.classList.contains('drawer-overlay')) {
+      setIsDrawerOpen(false);
+    }
   };
 
   const goToOverview = () => {
@@ -28,98 +36,82 @@ const RecipeSwipeComponent = ({ recipe }) => {
   };
 
   const handleSlideChange = (swiper) => {
-    document.querySelectorAll('video').forEach((video) => {
-      video.pause();
-    });
+    document.querySelectorAll('video').forEach((video) => video.pause());
     const activeSlide = swiper.slides[swiper.activeIndex];
     const video = activeSlide.querySelector('video');
     if (video) {
       video.play();
     }
-    if (swiper.activeIndex === 0) {
-      setCurrentStepDescription(overviewDescription);
-    } else {
-      setCurrentStepDescription(steps[swiper.activeIndex - 1].description);
-    }
+    setCurrentStepDescription(swiper.activeIndex === 0 ? overviewDescription : steps[swiper.activeIndex - 1].description);
+  };
+
+  const toggleMute = () => {
+    setIsMuted((prev) => !prev);
+    document.querySelectorAll('video').forEach((video) => (video.muted = !isMuted));
   };
 
   return (
     <div className="recipe-swipe">
+      {isDrawerOpen && <div className="drawer-overlay" onClick={closeDrawer}></div>}
       <Swiper
         spaceBetween={0}
         slidesPerView={1}
-        touchStartPreventDefault={false}
         allowTouchMove={!isDrawerOpen}
         onSlideChange={handleSlideChange}
       >
-        {/* Overview Slide */}
         <SwiperSlide>
           <div className="recipe-overview">
             <video
               src={overviewVideoUrl}
               className="overview-video"
-              playsInline // Add this attribute
-              onClick={(e) => {
-                e.stopPropagation();
-                e.target.paused ? e.target.play() : e.target.pause();
-              }}
+              playsInline
+              muted={isMuted}
+              onClick={(e) => e.target.paused ? e.target.play() : e.target.pause()}
             />
-            <div className="recipe-info">
-              <h2 className="recipe-title">{name}</h2>
-              <div className="recipe-details-cards">
-                <div className="recipe-card">
-                  <strong>Cuisine:</strong> {cuisine}
-                </div>
-                <div className="recipe-card">
-                  <strong>Time:</strong> {time} minutes
-                </div>
-                <div className="recipe-card">
-                  <strong>Servings:</strong> {servings}
-                </div>
-                <div className="recipe-card">
-                  <strong>Calories:</strong> {calories} kcal
-                </div>
+                <div className='title'>{name}</div>
+            <div className="recipe-info-cards">
+             
+              <div className="recipe-card">
+                <div className="recipe-card-header">Cuisine</div>
+                <div className="recipe-card-content">{cuisine}</div>
+              </div>
+              <div className="recipe-card">
+                <div className="recipe-card-header">Time</div>
+                <div className="recipe-card-content">{time}</div>
+              </div>
+              <div className="recipe-card">
+                <div className="recipe-card-header">Servings</div>
+                <div className="recipe-card-content">{servings}</div>
+              </div>
+              <div className="recipe-card">
+                <div className="recipe-card-header">Calories</div>
+                <div className="recipe-card-content">{calories} kcal</div>
               </div>
             </div>
           </div>
         </SwiperSlide>
 
-        {/* Steps Slides */}
         {steps.map((step, index) => (
           <SwiperSlide key={index}>
             <div className="recipe-step">
-              <button className="back-button" onClick={goToOverview}>
-                Back
-              </button>
+              <button className="back-button" onClick={goToOverview}>Back</button>
               <div className="step-indicator">Step {index + 1}</div>
+              <button className="mute-button" onClick={toggleMute}>{isMuted ? 'Unmute' : 'Mute'}</button>
               <video
                 src={step.videoUrl}
                 className="step-video"
-                playsInline // Add this attribute
-                onClick={(e) => {
-                  e.target.paused ? e.target.play() : e.target.pause();
-                }}
+                playsInline
+                muted={isMuted}
+                onClick={(e) => e.target.paused ? e.target.play() : e.target.pause()}
               />
             </div>
           </SwiperSlide>
         ))}
       </Swiper>
 
-      {/* Drawer Component */}
-      <div
-        className={`drawer ${isDrawerOpen ? 'open' : ''}`}
-        onClick={(e) => {
-          if (e.target.classList.contains('drawer-handle')) {
-            setIsDrawerOpen(!isDrawerOpen);
-          }
-        }}
-      >
+      <div className={`drawer ${isDrawerOpen ? 'open' : ''}`} onClick={(e) => e.target.classList.contains('drawer-handle') && toggleDrawer(currentStepDescription)}>
         <div className="drawer-handle">Swipe up for step details</div>
-        {isDrawerOpen && (
-          <div className="drawer-content">
-            <p>{currentStepDescription}</p>
-          </div>
-        )}
+        {isDrawerOpen && <div className="drawer-content"><p>{currentStepDescription}</p></div>}
       </div>
     </div>
   );
