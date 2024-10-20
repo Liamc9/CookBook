@@ -3,16 +3,10 @@ import ReactDOM from 'react-dom/client'
 import './index.css'
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
 import Root from './routes/root'
-import Signup from './routes/signup'
-import Login from './routes/login'
 import Feed from './routes/feed'
-import CreatorsPage from './routes/creatorspage'
-import Mycookbook from './routes/mycookbook'
 import Profile from './routes/profile'
 import Subscribinglist from './routes/subscribinglist'
 import AddRecipe from './routes/addRecipe/addRecipe'
-import ImageGallery from './routes/imagepage'
-import VideoGallery from './routes/videopage'
 import Videoscroll from './routes/videoscroll'
 import Recipeviewer from './components/creatorcard'
 import Chefcard from './components/chefcard'
@@ -20,6 +14,11 @@ import Editprofile from './routes/editprofile'
 import ChefSignup from './routes/chefSignup'
 import CookbookPage from './routes/CookbookPage'
 import RecipeSwipePage from './routes/RecipeSwipePage'
+import ChCookbooks from './routes/chefhub/chCookbooks'
+import ChAddCookbook from './routes/chefhub/chAddCookbook'
+import ChDashboard from './routes/chefhub/chDashboard'
+import ChRecipes from './routes/chefhub/chRecipes'
+import LoginSignupPage from './routes/login'
 
 const router = createBrowserRouter([
     {
@@ -31,12 +30,8 @@ const router = createBrowserRouter([
                 element: <Navigate to="/feed" replace />, // Redirect to /search
             },
             {
-                path: 'signup',
-                element: <Signup />,
-            },
-            {
                 path: 'login',
-                element: <Login />,
+                element: <LoginSignupPage />,
             },
             {
                 path: 'feed',
@@ -47,10 +42,6 @@ const router = createBrowserRouter([
                 element: <Profile />,
             },
             {
-                path: 'mycookbook',
-                element: <Mycookbook />,
-            },
-            {
                 path: 'subscribing',
                 element: <Subscribinglist />,
             },
@@ -58,19 +49,6 @@ const router = createBrowserRouter([
                 path: 'addrecipe',
                 element: <AddRecipe />,
             },
-            {
-                path: "creatorspage/:id",
-                element: <CreatorsPage />,
-              },
-             
-              {
-                path: "imagegallery",
-                element: <ImageGallery />,
-              },
-              {
-                path: "videogallery",
-                element: <VideoGallery />,
-              },
               {
                 path: "videoscroll",
                 element: <Videoscroll />,
@@ -99,6 +77,28 @@ const router = createBrowserRouter([
                     path: '/recipeswipepage/:docId',
                     element: <RecipeSwipePage />,
                 },
+                {
+                    path: '/chefhub/cookbooks',
+                    element: <ChCookbooks />,
+                },
+                {
+                    path: '/chefhub/cookbooks/addcookbook',
+                    element: <ChAddCookbook />,
+                },
+                {
+                    path: '/chefhub/recipes/addrecipe',
+                    element: <AddRecipe />,
+                },
+                {
+                    path: '/chefhub/recipes',
+                    element: <ChRecipes />,
+                },
+                
+                {
+                    path: '/chefhub/dashboard',
+                    element: <ChDashboard />,
+                }
+                
         ],
     },
 ])

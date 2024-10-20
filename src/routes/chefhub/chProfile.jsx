@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 
 // CREATE FUNCTION
-export default function ExampleRoute() {
+export default function ChProfile() {
     // STATE VARIABLES
     const [state, setState] = useState(0)
 

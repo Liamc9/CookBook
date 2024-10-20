@@ -1,5 +1,4 @@
 import React from 'react';
-import Input from '../../components/Input';
 import FileInput from './fileInput';
 
 const RecipeStep = ({ step, index, onFileChange, onDescriptionChange, addDescriptionField, removeDescriptionField }) => {
@@ -14,7 +13,7 @@ const RecipeStep = ({ step, index, onFileChange, onDescriptionChange, addDescrip
       </div>
       {step.descriptions.map((desc, descIndex) => (
         <div key={descIndex} className="mb-4">
-          <Input
+          <input
             name="description"
             id="description"
             type="textarea"

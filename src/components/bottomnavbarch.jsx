@@ -4,7 +4,7 @@ import { faHome, faNewspaper, faPlusSquare, faBookOpen, faUser } from '@fortawes
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { useState, useEffect } from 'react';
 
-export default function BottomNavbar() {
+export default function BottomNavbarCh() {
     const [userId, setUserId] = useState(null);
 
     useEffect(() => {
@@ -23,21 +23,26 @@ export default function BottomNavbar() {
     return (
         <div className="fixed inset-x-0 bottom-0 bg-white shadow-md z-30">
             <div className="flex justify-around text-sm py-2">
-                <Link to="/feed" className="flex-1 text-center text-gray-700 hover:text-custom-brown transition duration-300 ease-in-out">
+                <Link to="/chefhub/dashboard" className="flex-1 text-center text-gray-700 hover:text-custom-brown transition duration-300 ease-in-out">
                     <div className="flex flex-col items-center">
                         <FontAwesomeIcon icon={faHome} size="lg" />
-                        <span className="mt-1">Feed</span>
+                        <span className="mt-1">Dashboard</span>
                     </div>
                 </Link>
-                <Link to="/subscribing" className="flex-1 text-center text-gray-700 hover:text-custom-brown transition duration-300 ease-in-out">
+                <Link to="/chefhub/recipes" className="flex-1 text-center text-gray-700 hover:text-custom-brown transition duration-300 ease-in-out">
                     <div className="flex flex-col items-center">
                         <FontAwesomeIcon icon={faNewspaper} size="lg" />
-                        <span className="mt-1">Subscribing</span>
+                        <span className="mt-1">Recipes</span>
                     </div>
                 </Link>
-               
+                <Link to="/chefhub/cookbooks" className="flex-1 text-center text-gray-700 hover:text-custom-brown transition duration-300 ease-in-out">
+                    <div className="flex flex-col items-center">
+                        <FontAwesomeIcon icon={faNewspaper} size="lg" />
+                        <span className="mt-1">Cookbooks</span>
+                    </div>
+                </Link>
                 {userId ? (
-                    <Link to={`/profile/${userId}`} className="flex-1 text-center text-gray-700 hover:text-custom-brown transition duration-300 ease-in-out">
+                    <Link to={`/chefhub/profile/${userId}`} className="flex-1 text-center text-gray-700 hover:text-custom-brown transition duration-300 ease-in-out">
                         <div className="flex flex-col items-center">
                             <FontAwesomeIcon icon={faUser} size="lg" />
                             <span className="mt-1">Profile</span>

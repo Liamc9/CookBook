@@ -1,23 +1,37 @@
-// LoginPage.js
+// LoginSignupPage.js - Combined Component
 import React, { useState } from "react";
+import { Login } from 'liamc9npm';
 import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
   setPersistence,
   browserSessionPersistence,
   browserLocalPersistence,
+  GoogleAuthProvider,
+  signInWithPopup,
+  OAuthProvider,
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  updateProfile,
+  signOut,
 } from "firebase/auth";
 import { auth } from "../firebase-config";
-import SignupPage from "./signup"; // Import SignupPage for modal switching
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "../firebase-config";
+import { AuthPageView } from "liamc9npm";
 
-const LoginPage = ({ closeModal }) => {
+const LoginSignupPage = ({ closeModal }) => {
+  const [showSignUp, setShowSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const [reenterPassword, setReenterPassword] = useState("");
   const [error, setError] = useState("");
   const [resetEmailSent, setResetEmailSent] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [showSignUp, setShowSignUp] = useState(false); // Toggle for Signup page
+  const [isSignupComplete, setIsSignupComplete] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   // Handle user login
   const handleLogin = async (e) => {
@@ -30,14 +44,10 @@ const LoginPage = ({ closeModal }) => {
         ? browserLocalPersistence
         : browserSessionPersistence;
       await setPersistence(auth, persistenceType);
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
 
       if (userCredential.user.emailVerified) {
-        closeModal(); // Close modal after successful login
+        handleLoginSuccess();
       } else {
         await auth.signOut();
         setError("Your email is not verified. Please verify your email.");
@@ -71,6 +81,70 @@ const LoginPage = ({ closeModal }) => {
     }
   };
 
+  // Handle login success
+  const handleLoginSuccess = () => {
+    closeModal();
+  };
+
+  // Handle Google sign-in
+  const handleGoogleSignIn = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      if (result.user) {
+        handleLoginSuccess();
+      }
+    } catch (error) {
+      setError("Failed to sign in with Google. Please try again.");
+    }
+  };
+
+  // Handle Apple sign-in
+  const handleAppleSignIn = async () => {
+    try {
+      const provider = new OAuthProvider('apple.com');
+      const result = await signInWithPopup(auth, provider);
+      if (result.user) {
+        handleLoginSuccess();
+      }
+    } catch (error) {
+      setError("Failed to sign in with Apple. Please try again.");
+    }
+  };
+
+  // Handle user signup
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    if (password !== reenterPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      await updateProfile(user, {
+        displayName: username,
+      });
+      await sendEmailVerification(user);
+
+      const userData = {
+        email: email,
+        username: username,
+      };
+      await setDoc(doc(db, "users", user.uid), userData);
+      await signOut(auth);
+
+      setIsSignupComplete(true);
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+      setError(error.message);
+    }
+  };
+
   // Modal inline styling
   const modalBackdropStyle = {
     position: "fixed",
@@ -87,8 +161,6 @@ const LoginPage = ({ closeModal }) => {
   const modalContentStyle = {
     backgroundColor: "white",
     padding: "20px",
-    borderRadius: "8px",
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
     width: "100%",
     maxWidth: "500px",
     textAlign: "center",
@@ -96,113 +168,37 @@ const LoginPage = ({ closeModal }) => {
     overflowY: "auto",
   };
 
-  // If showSignUp is true, render the SignupPage component
-  if (showSignUp) {
-    return <SignupPage closeModal={closeModal} setShowSignUp={setShowSignUp} />;
-  }
-
+  // If showSignUp is true, render the AuthPageView component
   return (
     <div style={modalBackdropStyle}>
       <div style={modalContentStyle}>
-        <h2 className="text-2xl font-bold text-gray-900">Sign in to your account</h2>
-        {resetEmailSent && (
-          <p className="mt-2 text-sm text-green-500">
-            A password reset email has been sent to {email}.
-          </p>
-        )}
-        {error && (
-          <p className="text-sm text-red-500">{error}</p>
-        )}
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div className="relative">
-            <input
-              name="email"
-              id="email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="peer w-full rounded-lg border-2 border-gray-300 bg-transparent p-2 outline-none focus:border-b-4 focus:border-custom-brown"
-            />
-            <label
-              htmlFor="email"
-              className={`pointer-events-none absolute left-0 m-1 ml-2.5 transform bg-white px-1.5 text-base text-gray-500 transition-transform duration-300 ease-in-out peer-focus:ml-5 peer-focus:-translate-y-[70%] peer-focus:scale-90 peer-focus:px-1 peer-focus:py-0 peer-focus:text-custom-brown ${
-                email ? "ml-5 -translate-y-[70%] scale-90 px-1 py-0" : ""
-              }`}
-            >
-              Email
-            </label>
-          </div>
-          <div className="relative">
-            <input
-              name="password"
-              id="password"
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="peer w-full rounded-lg border-2 border-gray-300 bg-transparent p-2 outline-none focus:border-b-4 focus:border-custom-brown"
-            />
-            <label
-              htmlFor="password"
-              className={`pointer-events-none absolute left-0 m-1 ml-2.5 transform bg-white px-1.5 text-base text-gray-500 transition-transform duration-300 ease-in-out peer-focus:ml-5 peer-focus:-translate-y-[70%] peer-focus:scale-90 peer-focus:px-1 peer-focus:py-0 peer-focus:text-custom-brown ${
-                password ? "ml-5 -translate-y-[70%] scale-90 px-1 py-0" : ""
-              }`}
-            >
-              Password
-            </label>
-          </div>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-              />
-              <label
-                htmlFor="remember-me"
-                className="ml-2 block text-sm text-gray-900"
-              >
-                Remember me
-              </label>
-            </div>
-            <div className="text-sm">
-              <button
-                type="button"
-                onClick={handleForgotPassword}
-                className="font-medium text-custom-brown"
-              >
-                Forgot your password?
-              </button>
-            </div>
-          </div>
-          <div>
-            <button
-              type="submit"
-              className="group relative flex w-full justify-center rounded-md bg-custom-brown px-4 py-2 text-white font-medium hover:bg-custom-brown focus:ring-2 focus:ring-custom-brown"
-              disabled={isLoading}
-            >
-              {isLoading ? "Signing in..." : "Sign in"}
-            </button>
-          </div>
-        </form>
-        <div className="mt-4 text-center">
-          <p>
-            Don't have an account?{" "}
-            <button
-              onClick={() => setShowSignUp(true)}
-              className="font-medium text-custom-brown hover:text-custom-brown"
-            >
-              Sign up
-            </button>
-          </p>
-        </div>
+        <AuthPageView
+          email={email}
+          setEmail={setEmail}
+          password={password}
+          setPassword={setPassword}
+          username={username}
+          setUsername={setUsername}
+          reenterPassword={reenterPassword}
+          setReenterPassword={setReenterPassword}
+          error={error}
+          isSignupComplete={isSignupComplete}
+          isLoading={isLoading}
+          termsAccepted={termsAccepted}
+          setTermsAccepted={setTermsAccepted}
+          handleSignup={handleSignup}
+          handleLogin={handleLogin}
+          setShowSignUp={setShowSignUp}
+          isSignUp={showSignUp}
+          onForgotPassword={handleForgotPassword}
+          resetEmailSent={resetEmailSent}
+          onGoogleSignIn={handleGoogleSignIn}
+          onAppleSignIn={handleAppleSignIn}
+          themeColor="#B08B5B"
+        />
       </div>
     </div>
   );
 };
 
-export default LoginPage;
+export default LoginSignupPage;

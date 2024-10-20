@@ -1,10 +1,11 @@
-// Root.js
 import { Outlet, useLocation } from "react-router-dom";
 import NavBar from "../components/topnavbar";
 import BottomTabs from "../components/bottomnavbar";
 import { useEffect, useState } from "react";
 import LoginPage from "./login";
 import { auth } from "../firebase-config";
+import BottomNavbarCh from "../components/bottomnavbarch";
+import { HomeIcon2, StrategyIcon, PeriodIcon, SecurityIcon, SettingsIcon } from "../assets/Icons";
 
 export default function Root() {
   const location = useLocation();
@@ -38,6 +39,15 @@ export default function Root() {
     return pathsToHide.some((path) => location.pathname.startsWith(path));
   };
 
+  // Determine which bottom component to render
+  const getBottomComponent = () => {
+    if (location.pathname.startsWith("/chefhub")) {
+      return <BottomNavbarCh />;
+    } else {
+      return <BottomTabs />;
+    }
+  };
+
   // Function to close the modal after login
   const closeModal = () => {
     // Modal will automatically close when user is authenticated
@@ -48,14 +58,15 @@ export default function Root() {
     return <div>Loading...</div>;
   }
 
-  // Render the modal if the user is not authenticated
+  // Render the NavBar for both authenticated and unauthenticated users
   return (
     <div className="min-h-screen overflow-y-auto overflow-x-hidden bg-white">
+      
       {user ? (
         <>
-          {!shouldHideTopNav() && <NavBar />}
+        {!shouldHideTopNav() && <NavBar />}
           <Outlet /> {/* Renders the current route's component */}
-          {!shouldHideBottomNav() && <BottomTabs />}
+          {!shouldHideBottomNav() && getBottomComponent()}
         </>
       ) : (
         <LoginPage closeModal={closeModal} />

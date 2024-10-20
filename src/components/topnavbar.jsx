@@ -128,12 +128,8 @@ export default function NavBar() {
                       )}
                     </div>
                   ) : (
-                    <Link
-                      to="/login"
-                      className="w-28 transform rounded-md bg-custom-brown px-1 py-1 font-medium text-white transition-colors duration-200 hover:bg-custom-brown focus:outline-none focus:ring-1 focus:ring-custom-brown md:px-2 md:py-2"
-                    >
-                      Sign In
-                    </Link>
+                    <div></div>
+                      
                   ))}
               </div>
             </div>
