@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import LoginPage from "./login";
 import { auth } from "../firebase-config";
 import BottomNavbarCh from "../components/bottomnavbarch";
-import { HomeIcon2, StrategyIcon, PeriodIcon, SecurityIcon, SettingsIcon } from "../assets/Icons";
 
 export default function Root() {
   const location = useLocation();

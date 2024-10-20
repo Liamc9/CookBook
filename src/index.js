@@ -7,9 +7,6 @@ import Feed from './routes/feed'
 import Profile from './routes/profile'
 import Subscribinglist from './routes/subscribinglist'
 import AddRecipe from './routes/addRecipe/addRecipe'
-import Videoscroll from './routes/videoscroll'
-import Recipeviewer from './components/creatorcard'
-import Chefcard from './components/chefcard'
 import Editprofile from './routes/editprofile'
 import ChefSignup from './routes/chefSignup'
 import CookbookPage from './routes/CookbookPage'
@@ -49,18 +46,6 @@ const router = createBrowserRouter([
                 path: 'addrecipe',
                 element: <AddRecipe />,
             },
-              {
-                path: "videoscroll",
-                element: <Videoscroll />,
-              },
-              {
-                path: "recipeviewer",
-                element: <Recipeviewer />,
-              },
-              {
-              path: "chefcard",
-              element: <Chefcard />,
-              },
               {
                 path: "editprofile",
                 element: <Editprofile />,

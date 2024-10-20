@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { doc, getDoc, getDocs, collection, query, where } from "firebase/firestore";
 import { db } from "../firebase-config"; // Adjust the import path as needed
-import CookbookCard from "../components/CookbookCard"; // Import your CookbookCard component
+import { RecipeCard } from "liamc9npm"; // Import your CookbookCard component
 
 export default function CookbookPage() {
   const { cookbookId } = useParams(); // Get the cookbook ID from the URL
@@ -90,7 +90,7 @@ export default function CookbookPage() {
       {/* Recipes List */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {recipes.map(recipe => (
-          <CookbookCard key={recipe.id} recipe={recipe} />
+          <RecipeCard key={recipe.id} recipe={recipe} />
         ))}
       </div>
     </div>

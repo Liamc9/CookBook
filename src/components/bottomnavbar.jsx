@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faNewspaper, faPlusSquare, faBookOpen, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faNewspaper, faUser } from '@fortawesome/free-solid-svg-icons';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { useState, useEffect } from 'react';
 

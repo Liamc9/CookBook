@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { db } from "../firebase-config";
 import { collection, getDocs } from "firebase/firestore";
-import CookbookCard from '../components/CookbookCard'
 import { RecipeCard } from 'liamc9npm'
 
 // CREATE FUNCTION
