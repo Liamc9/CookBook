@@ -3,9 +3,119 @@ import { useState, useEffect } from 'react';
 import { getFirestore, collection, addDoc, doc, updateDoc, arrayUnion, getDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
-import { CookbookCard } from 'liamc9npm';
-import './chAddCookbook.css';
+import { CookbookCard, Input } from 'liamc9npm';
+import { ChevronLeftIcon } from '../../assets/Icons';
+import styled from 'styled-components';
 
+// STYLED COMPONENTS
+const Header = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px 0;
+`;
+
+const BackButton = styled.button`
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    &:hover {
+        text-decoration: underline;
+    }
+`;
+
+const PageTitle = styled.h2`
+    font-size: 30px;
+    font-weight: 500;
+`;
+
+const AddCookbookContainer = styled.div`
+    padding: 20px;
+    max-width: 600px;
+    margin-bottom: 100px;
+    border-radius: 10px;
+`;
+
+const CookbookPreview = styled.div`
+    margin-bottom: 30px;
+`;
+
+const InputGroup = styled.div`
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+`;
+
+const AddCookbookButton = styled.button`
+    padding: 10px 20px;
+    background-color: #B08B5B;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+        background-color: #45a049;
+    }
+`;
+
+const RecipesSection = styled.div`
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    position: relative;
+`;
+
+const AddRecipeButton = styled.button`
+    padding: 10px 20px;
+    background-color: #000000;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+
+    &:hover {
+        background-color: #1976D2;
+    }
+`;
+
+const RecipesList = styled.ul`
+    list-style-type: none;
+    padding: 0;
+    margin-top: 50px;
+`;
+
+const RecipeItem = styled.li`
+    padding: 10px;
+    border-bottom: 1px solid #e0e0e0;
+
+    &:last-child {
+        border-bottom: none;
+    }
+`;
+
+const StickyBanner = styled.div`
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #ffffff;
+    padding: 15px;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    z-index: 1000;
+`;
+
+// COMPONENT
 export default function AddCookbook() {
     const [cuisine, setCuisine] = useState('');
     const [title, setTitle] = useState('');
@@ -98,52 +208,61 @@ export default function AddCookbook() {
 
     // HTML
     return (
-        <div className="add-cookbook-container">
-            <h2>Add New Cookbook</h2>
-            {/* Preview of the CookbookCard as the user types */}
-            <div className="cookbook-preview">
-                <h3>Cookbook Preview</h3>
-                <CookbookCard cookbook={{ cuisine, title, imageUrl, chef, numberOfRecipes: addedRecipes.length }} />
-            </div>
-            <div className="input-group">
-                <label>Cuisine:</label>
-                <input
-                    type="text"
-                    value={cuisine}
-                    onChange={(e) => setCuisine(e.target.value)}
-                    placeholder="Enter cuisine type"
-                />
-            </div>
-            <div className="input-group">
-                <label>Title:</label>
-                <input
-                    type="text"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Enter cookbook title"
-                />
-            </div>
-            <div className="input-group">
-                <label>Image URL:</label>
-                <input
-                    type="text"
-                    value={imageUrl}
-                    onChange={(e) => setImageUrl(e.target.value)}
-                    placeholder="Enter image URL"
-                />
-            </div>
-            <button className="add-cookbook-button" onClick={handleAddCookbook}>Add Cookbook</button>
+        <>
+            <Header>
+                <BackButton onClick={() => navigate(-1)}><ChevronLeftIcon className='w-6 h-6'/></BackButton>
+                <PageTitle>Add Cookbook</PageTitle>
+            </Header>
+            <AddCookbookContainer>
+                <CookbookPreview>
+                    <CookbookCard cookbook={{ cuisine, title, imageUrl, chef, numberOfRecipes: addedRecipes.length }} />
+                </CookbookPreview>
+                <InputGroup>
+                    <Input
+                        type="text"
+                        name='title'
+                        value={title}
+                        label='Title'
+                        color='#B08B5B'
+                        onChange={(e) => setTitle(e.target.value)}
+                    />
+                </InputGroup>
+                <InputGroup>
+                    <Input
+                        type="text"
+                        name='cuisine'
+                        value={cuisine}
+                        label='Cuisine'
+                        color='#B08B5B'
+                        onChange={(e) => setCuisine(e.target.value)}
+                    />
+                </InputGroup>
+                <InputGroup>
+                    <Input
+                        type="text"
+                        name='imageurl'
+                        value={imageUrl}
+                        label='ImageUrl'
+                        color='#B08B5B'
+                        onChange={(e) => setImageUrl(e.target.value)}
+                    />
+                </InputGroup>
 
-            {/* Recipes Section */}
-            <div className="recipes-section">
-                <h3>Recipes</h3>
-                <button className="add-recipe-button" onClick={handleAddRecipe}>Add Recipe</button>
-                <ul className="recipes-list">
-                    {addedRecipes.map(recipe => (
-                        <li key={recipe.id}>{recipe.title}</li>
-                    ))}
-                </ul>
-            </div>
-        </div>
+                {/* Recipes Section */}
+                <RecipesSection>
+                    <h3>Recipes</h3>
+                    <AddRecipeButton onClick={handleAddRecipe}>Add Recipe</AddRecipeButton>
+                    <RecipesList>
+                        {addedRecipes.map(recipe => (
+                            <RecipeItem key={recipe.id}>{recipe.title}</RecipeItem>
+                        ))}
+                    </RecipesList>
+                </RecipesSection>
+            </AddCookbookContainer>
+
+            <StickyBanner>
+                <AddCookbookButton onClick={handleAddCookbook}>Add Cookbook</AddCookbookButton>
+            </StickyBanner>
+        </>
     );
 }

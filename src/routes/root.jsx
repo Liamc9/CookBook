@@ -29,12 +29,12 @@ export default function Root() {
 
   // Conditionally hide top navbar on specific paths
   const shouldHideTopNav = () => {
-    const pathsToHide = ["/updatecarddetails", "/recipeswipepage"];
+    const pathsToHide = ["/updatecarddetails", "/recipeswipepage", "/chefhub/cookbooks/addcookbook", "/chefhub/recipes/addnewrecipe"];
     return pathsToHide.some((path) => location.pathname.startsWith(path));
   };
 
   const shouldHideBottomNav = () => {
-    const pathsToHide = ["/updatecarddetails", "/profile", "/recipeswipepage"];
+    const pathsToHide = ["/updatecarddetails", "/profile", "/recipeswipepage", "/chefhub/recipes/addnewrecipe", "/chefhub/cookbooks/addcookbook"];
     return pathsToHide.some((path) => location.pathname.startsWith(path));
   };
 
@@ -59,7 +59,7 @@ export default function Root() {
 
   // Render the NavBar for both authenticated and unauthenticated users
   return (
-    <div className="min-h-screen overflow-y-auto overflow-x-hidden bg-white">
+    <div className="min-h-[100svh] overflow-y-auto overflow-x-hidden bg-white">
       
       {user ? (
         <>

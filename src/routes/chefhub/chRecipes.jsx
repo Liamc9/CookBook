@@ -1,87 +1,115 @@
-// IMPORTS
-import { useState, useEffect } from 'react'
-import { RecipeCard } from 'liamc9npm'
-import { getFirestore, doc, getDoc, collection, getDocs } from 'firebase/firestore'
-import { getAuth } from 'firebase/auth'
-import { useNavigate } from 'react-router-dom'
-import './chRecipes.css';
+import { useState, useEffect } from 'react';
+import styled from 'styled-components';
+import { RecipeCard } from 'liamc9npm';
+import { getFirestore, doc, getDoc, collection } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
+
+const ChRecipesContainer = styled.div`
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+`;
+
+const Header = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 50px;
+    font-weight: 700;
+`;
+
+const PageTitle = styled.h1`
+  font-size: 2em;
+  margin: 0;
+`;
+
+const AddRecipeButton = styled.button`
+  padding: 10px 20px;
+  background-color: #B08B5B;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #45a049;
+  }
+`;
+
+const RecipeCards = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  margin-top: 40px;
+`;
 
 export default function ChRecipes() {
-    const [recipes, setRecipes] = useState([]);
-    const navigate = useNavigate();
+  const [recipes, setRecipes] = useState([]);
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchRecipes = async () => {
-            // Initialize Firestore and Auth instances
-            console.log('Initializing Firestore and Auth instances');
-            const db = getFirestore();
-            const auth = getAuth();
-            const user = auth.currentUser; // Get the currently logged-in user
+  useEffect(() => {
+    const fetchRecipes = async () => {
+      console.log('Initializing Firestore and Auth instances');
+      const db = getFirestore();
+      const auth = getAuth();
+      const user = auth.currentUser;
 
-            if (user) {
-                console.log('User is logged in:', user.uid);
-                try {
-                    // Get user document reference from Firestore
-                    console.log('Fetching user document from Firestore');
-                    const userDocRef = doc(db, 'users', user.uid);
-                    const userDocSnap = await getDoc(userDocRef); // Fetch the user document snapshot
+      if (user) {
+        console.log('User is logged in:', user.uid);
+        try {
+          console.log('Fetching user document from Firestore');
+          const userDocRef = doc(db, 'users', user.uid);
+          const userDocSnap = await getDoc(userDocRef);
 
-                    if (userDocSnap.exists()) {
-                        console.log('User document exists');
-                        // Extract user data from the document snapshot
-                        const userData = userDocSnap.data();
-                        console.log('User data:', userData);
+          if (userDocSnap.exists()) {
+            console.log('User document exists');
+            const userData = userDocSnap.data();
+            console.log('User data:', userData);
 
-                        // Get the array of recipe IDs from user data, default to empty array if not present
-                        const recipeIds = userData.recipes || [];
-                        console.log('Recipe IDs:', recipeIds);
+            const recipeIds = userData.recipes || [];
+            console.log('Recipe IDs:', recipeIds);
 
-                        // Reference to the 'recipes' collection
-                        const recipesCollectionRef = collection(db, 'recipes');
-                        // Create an array of promises to fetch each recipe document by its ID
-                        console.log('Fetching recipes from Firestore');
-                        const recipePromises = recipeIds.map(id => getDoc(doc(recipesCollectionRef, id)));
-                        // Wait for all recipe documents to be fetched
-                        const recipeDocs = await Promise.all(recipePromises);
-                        console.log('Fetched recipe documents:', recipeDocs);
+            const recipesCollectionRef = collection(db, 'recipes');
+            console.log('Fetching recipes from Firestore');
+            const recipePromises = recipeIds.map(id => getDoc(doc(recipesCollectionRef, id)));
+            const recipeDocs = await Promise.all(recipePromises);
+            console.log('Fetched recipe documents:', recipeDocs);
 
-                        // Extract data from each document and add its ID
-                        const recipeData = recipeDocs.map(doc => ({ id: doc.id, ...doc.data() }));
-                        console.log('Recipe data:', recipeData);
+            const recipeData = recipeDocs.map(doc => ({ id: doc.id, ...doc.data() }));
+            console.log('Recipe data:', recipeData);
 
-                        // Update state with the fetched recipes
-                        setRecipes(recipeData);
-                    } else {
-                        console.log('User document does not exist');
-                    }
-                } catch (error) {
-                    // Log any errors that occur during the fetch process
-                    console.error('Error fetching recipes:', error);
-                }
-            } else {
-                console.log('No user is logged in');
-            }
-        };
+            setRecipes(recipeData);
+          } else {
+            console.log('User document does not exist');
+          }
+        } catch (error) {
+          console.error('Error fetching recipes:', error);
+        }
+      } else {
+        console.log('No user is logged in');
+      }
+    };
 
-        // Call the function to fetch recipes when the component mounts
-        console.log('Calling fetchRecipes');
-        fetchRecipes();
-    }, []);
+    console.log('Calling fetchRecipes');
+    fetchRecipes();
+  }, []);
 
-    // HTML
-    return (
-        <div className="ch-recipes-container">
-            {/* Add Recipe Button */}
-            <div className="add-recipe-button">
-                <button onClick={() => navigate('/chefhub/recipes/addrecipe')}>Add Recipe</button>
-            </div>
-            
-            {/* Render a RecipeCard component for each recipe in the state */}
-            <div className="recipe-cards">
-                {recipes.map(recipe => (
-                    <RecipeCard key={recipe.id} recipe={recipe} />
-                ))}
-            </div>
-        </div>
-    )
+  return (
+    <ChRecipesContainer>
+      <Header>
+        <PageTitle>Recipes</PageTitle>
+        <AddRecipeButton onClick={() => navigate('/chefhub/recipes/addnewrecipe')}>
+          Add Recipe
+        </AddRecipeButton>
+      </Header>
+
+      <RecipeCards>
+        {recipes.map(recipe => (
+          <RecipeCard key={recipe.id} recipe={recipe} />
+        ))}
+      </RecipeCards>
+    </ChRecipesContainer>
+  );
 }

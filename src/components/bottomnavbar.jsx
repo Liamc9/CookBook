@@ -21,36 +21,28 @@ export default function BottomNavbar() {
     }, []);
 
     return (
-        <div className="fixed inset-x-0 bottom-0 bg-white shadow-md z-30">
-            <div className="flex justify-around text-sm py-2">
-                <Link to="/feed" className="flex-1 text-center text-gray-700 hover:text-custom-brown transition duration-300 ease-in-out">
+        <div className="fixed inset-x-0 bottom-0 bg-white shadow-md z-30 border-t border-gray-300">
+            <div className="flex justify-around text-sm py-3">
+                <Link to="/feed" className="flex-1 text-center text-gray-500 hover:text-custom-brown transition duration-300 ease-in-out">
                     <div className="flex flex-col items-center">
                         <FontAwesomeIcon icon={faHome} size="lg" />
                         <span className="mt-1">Feed</span>
                     </div>
                 </Link>
-                <Link to="/subscribing" className="flex-1 text-center text-gray-700 hover:text-custom-brown transition duration-300 ease-in-out">
+                <Link to="/subscribing" className="flex-1 text-center text-gray-500 hover:text-custom-brown transition duration-300 ease-in-out">
                     <div className="flex flex-col items-center">
                         <FontAwesomeIcon icon={faNewspaper} size="lg" />
                         <span className="mt-1">Subscribing</span>
                     </div>
                 </Link>
                
-                {userId ? (
-                    <Link to={`/profile/${userId}`} className="flex-1 text-center text-gray-700 hover:text-custom-brown transition duration-300 ease-in-out">
+                    <Link to={`/more`} className="flex-1 text-center text-gray-500 hover:text-custom-brown transition duration-300 ease-in-out">
                         <div className="flex flex-col items-center">
                             <FontAwesomeIcon icon={faUser} size="lg" />
-                            <span className="mt-1">Profile</span>
+                            <span className="mt-1">More</span>
                         </div>
                     </Link>
-                ) : (
-                    <div className="flex-1 text-center text-gray-400">
-                        <div className="flex flex-col items-center">
-                            <FontAwesomeIcon icon={faUser} size="lg" />
-                            <span className="mt-1">Profile</span>
-                        </div>
-                    </div>
-                )}
+               
             </div>
         </div>
     );

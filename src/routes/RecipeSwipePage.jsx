@@ -39,11 +39,11 @@ export default function RecipeSwipePage() {
   // HTML
   return (
     <>
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex items-center justify-center max-h-[100svh] overflow-auto">
         {loading ? (
           <div>Loading recipe...</div> // Loading state
         ) : recipe ? (
-          <div className="w-full h-full max-w-screen-md">
+          <div className="w-full max-h-[100svh] max-w-screen-md">
             <RecipeSwipeComponent recipe={recipe} /> {/* Pass fetched recipe to component */}
           </div>
         ) : (

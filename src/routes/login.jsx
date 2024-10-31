@@ -1,6 +1,5 @@
 // LoginSignupPage.js - Combined Component
 import React, { useState } from "react";
-import { Login } from 'liamc9npm';
 import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,

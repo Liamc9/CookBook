@@ -1,11 +1,8 @@
-// IMPORTS
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getFirestore, collection, query, where, getDocs } from "firebase/firestore";
 
-// CREATE FUNCTION
-export default function Search() {
-  // STATE VARIABLES
+export default function Search({ onSearchRecipes }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [matchingUsers, setMatchingUsers] = useState([]);
   const [error, setError] = useState(null);
@@ -56,33 +53,31 @@ export default function Search() {
   // Handle form submission
   const handleSubmit = (event) => {
     event.preventDefault();
-    // Search logic is handled in handleInputChange
+    // Trigger recipe search callback
+    if (onSearchRecipes && searchQuery.trim() !== "") {
+      onSearchRecipes(searchQuery);
+    }
+    setDropdownVisible(false);
   };
 
-  // HTML
   return (
     <div className="relative">
-      <form onSubmit={handleSubmit} className="w-full rounded-lg bg-white p-4 flex items-center">
+      <form onSubmit={handleSubmit} >
         <input
           type="text"
           name="search"
           id="search"
           value={searchQuery}
           onChange={handleInputChange}
-          placeholder="Search by username..."
-          className="flex-1 border border-gray-300 rounded-l-lg p-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Search by username or recipe title..."
+          className="w-full border border-gray-300 rounded-lg p-3 text-gray-800 focus:outline-none"
           autoComplete="off"
         />
-        <button
-          type="submit"
-          className="bg-blue-500 text-white p-3 rounded-r-lg hover:bg-blue-600 transition duration-300"
-        >
-          Search
-        </button>
+
       </form>
 
       {dropdownVisible && matchingUsers.length > 0 && (
-        <ul className="absolute left-0 right-0 mt-1 bg-white shadow-lg border border-gray-200 rounded-lg max-h-60 overflow-y-auto z-10">
+        <ul className="absolute left-0 right-0 mt-1 bg-white shadow-lg border border-gray-200 rounded-lg max-h-60 overflow-y-auto z-40">
           {matchingUsers.map((user) => (
             <li
               key={user.id}

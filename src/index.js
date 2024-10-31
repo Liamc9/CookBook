@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
+import StripeProvider from "./stripeprovider";
 import Root from './routes/root'
 import Feed from './routes/feed'
 import Profile from './routes/profile'
@@ -16,6 +17,8 @@ import ChAddCookbook from './routes/chefhub/chAddCookbook'
 import ChDashboard from './routes/chefhub/chDashboard'
 import ChRecipes from './routes/chefhub/chRecipes'
 import LoginSignupPage from './routes/login'
+import More from './routes/More';
+import MultiStepForm from './routes/chefhub/addNewRecipe';
 
 const router = createBrowserRouter([
     {
@@ -82,8 +85,15 @@ const router = createBrowserRouter([
                 {
                     path: '/chefhub/dashboard',
                     element: <ChDashboard />,
-                }
-                
+                }, 
+                {
+                    path: '/more',
+                    element: <More />,
+                },
+                {
+                    path: '/chefhub/recipes/addnewrecipe',
+                    element: <MultiStepForm />,
+                },
         ],
     },
 ])
@@ -91,6 +101,8 @@ const router = createBrowserRouter([
 const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
     <React.StrictMode>
+        <StripeProvider>
         <RouterProvider router={router} />
+        </StripeProvider>
     </React.StrictMode>
 )

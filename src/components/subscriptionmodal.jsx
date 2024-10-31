@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faX } from "@fortawesome/free-solid-svg-icons";
 import { doc, updateDoc, arrayUnion } from "firebase/firestore";
 import { db } from "../firebase-config"; // Adjust the import path as needed
+import StripePaymentDisplay from "./stripePaymentDisplay";
 
 export default function SubscriptionModal({ isModalOpen, closeModal, profileUserId, currentUserId }) {
   useEffect(() => {
@@ -63,6 +64,13 @@ export default function SubscriptionModal({ isModalOpen, closeModal, profileUser
                 Subscribe for Free
               </button>
             </div>
+            <StripePaymentDisplay
+  useCustomer={true}
+  customerEmail="liam12crowley@gmail.com"
+  attachPaymentMethod={true}
+  currency="eur" // Specify the currency here
+  destinationAccount="acct_1PP14o4CfuQN95oo" // Specify the Stripe Connect account ID if blank the payment just goes to me
+/>
           </div>
         </div>
       </div>

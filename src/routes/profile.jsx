@@ -3,11 +3,12 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { getAuth } from "firebase/auth";
 import { doc, getDoc, getDocs, collection, query, where } from "firebase/firestore";
 import { db } from "../firebase-config"; // Adjust the import path as needed
-import {RecipeCard, CookbookCard} from "liamc9npm"; // Import your CookbookCard component
+import { RecipeCard, CookbookCard, BottomDrawer } from "liamc9npm"; // Imported BottomDrawer
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFacebook, faTwitter, faYoutube, faTiktok } from "@fortawesome/free-brands-svg-icons";
 import { faUserEdit } from "@fortawesome/free-solid-svg-icons";
 import SubscriptionModal from "../components/subscriptionmodal";
+import StripePaymentDisplay from "../components/stripePaymentDisplay";
 
 export default function Profile() {
   const [userData, setUserData] = useState(null);
@@ -20,6 +21,15 @@ export default function Profile() {
   const { userId } = useParams(); // Get the user ID from the URL parameters
   const [isProfileOwner, setIsProfileOwner] = useState(false);
   const [currentUser, setCurrentUser] = useState(null); // To store current user data
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false); // State to handle drawer
+
+  // Drawer open handler
+  const openDrawer = () => setIsDrawerOpen(true);
+  
+  // Drawer close handler (linked to the `onClose` argType)
+  const closeDrawer = () => {
+    setIsDrawerOpen(false);
+  };
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -39,9 +49,7 @@ export default function Profile() {
             setUserData(data);
             await fetchRecipes(data.Recipes || []);
             await fetchCookbooks(data.cookbooks || []);
-            console.log(data)
           }
-          console.log(userData)
         } catch (error) {
           console.error("Error fetching user data: ", error);
         }
@@ -79,20 +87,20 @@ export default function Profile() {
           id: doc.id,
           ...doc.data(),
         }));
+
         setCookbooks(fetchedCookbooks);
       } catch (error) {
         console.error("Error fetching cookbooks: ", error);
       }
     };
-
+  
     fetchUserData();
   }, [userId]);
-console.log(cookbooks)
+
   const handleTabClick = (tabNumber) => {
     setActiveTab(tabNumber);
   };
 
- 
   const getTabContent = () => {
     switch (activeTab) {
       case 1:
@@ -112,16 +120,22 @@ console.log(cookbooks)
       case 2:
         return (
           <div className="p-4 text-center">
-<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {cookbooks.map(cookbook => (
-                <CookbookCard key={cookbook.id} cookbook={cookbook} />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {cookbooks.map((cookbook) => (
+                <CookbookCard
+                  key={cookbook.id}
+                  cookbook={cookbook}
+                  onCardClick={() => navigate(`/cookbooks/${cookbook.id}`)}
+                />
               ))}
-            </div>          </div>
-        ); 
+            </div>
+          </div>
+        );
       default:
         return <div className="p-4 text-center">Content for Tab 1</div>;
     }
   };
+  
 
   if (loading) {
     return <div>Loading...</div>;
@@ -172,76 +186,67 @@ console.log(cookbooks)
               <div className="z-20 flex flex-col text-lg font-semibold text-white md:text-xl">
                 <p>
                   {userData.firstName} {userData.lastName}
-                  {userData.name}
                 </p>
                 <p className="text-sm font-normal md:text-lg mb-2">
                   {userData.categories}
                 </p>
                 {/* Social and subscription */}
-        <div className=" absolute bottom-2 right-2 flex flex-row gap-2 ">
-          <div className="px-1 bg-blue-500 items-center justify-center rounded">
-            <FontAwesomeIcon icon={faFacebook} className="text-white" />
-          </div>
-          <div className="px-1 bg-blue-300 items-center justify-center rounded">
-            <FontAwesomeIcon icon={faTwitter} className="text-white" />
-          </div>
-          <div className="px-1 bg-red-500 items-center justify-center rounded">
-            <FontAwesomeIcon icon={faYoutube} className="text-white" />
-          </div>
-          <div className="px-1 bg-black items-center justify-center rounded">
-            <FontAwesomeIcon icon={faTiktok} className="text-white" />
-          </div>
-        </div>
-        
+                <div className="absolute bottom-2 right-2 flex flex-row gap-2">
+                  <div className="px-1 bg-blue-500 items-center justify-center rounded">
+                    <FontAwesomeIcon icon={faFacebook} className="text-white" />
+                  </div>
+                  <div className="px-1 bg-blue-300 items-center justify-center rounded">
+                    <FontAwesomeIcon icon={faTwitter} className="text-white" />
+                  </div>
+                  <div className="px-1 bg-red-500 items-center justify-center rounded">
+                    <FontAwesomeIcon icon={faYoutube} className="text-white" />
+                  </div>
+                  <div className="px-1 bg-black items-center justify-center rounded">
+                    <FontAwesomeIcon icon={faTiktok} className="text-white" />
+                  </div>
+                </div>
               </div>
             </div>
             <div className="absolute bottom-0 h-[50%] w-full bg-gray-500 opacity-50"></div>
           </div>
         </div>
         {!isProfileOwner && (
-          <button
-            onClick={() => setIsSubscriptionModalOpen(true)}
-            className="absolute top-2 right-2 flex items-center justify-center rounded bg-white p-1 text-center text-custom-brown shadow-md font-semibold"
-          >
-            + Subscribe
-          </button>
+            <button
+              onClick={openDrawer}
+              className="absolute top-2 right-2 px-2 py-2 bg-white text-custom-brown shadow-lg border border-gray-300 font-semibold rounded-md hover:bg-gray-300 transition"
+            >
+              Subscribe $19.99
+            </button>
         )}
       </div>
 
-      
-
       {/* Tabs */}
-<div className="flex w-full justify-center bg-white shadow-lg">
-  <div className="flex border-b border-gray-200 w-full">
-    <button
-      onClick={() => handleTabClick(1)}
-      className={`relative py-4 text-sm font-medium focus:outline-none transition duration-300 w-full ${
-        activeTab === 1
-          ? 'text-custom-brown'
-          : 'text-gray-500 hover:text-custom-brown'
-      }`}
-    >
-      All Recipes
-      {activeTab === 1 && (
-        <span className="absolute left-0 bottom-0 h-1 w-full bg-custom-brown animate-slideIn"></span>
-      )}
-    </button>
-    <button
-      onClick={() => handleTabClick(2)}
-      className={`relative py-4 text-sm font-medium focus:outline-none transition duration-300 w-full ${
-        activeTab === 2
-          ? 'text-custom-brown'
-          : 'text-gray-500 hover:text-custom-brown'
-      }`}
-    >
-      Cookbooks
-      {activeTab === 2 && (
-        <span className="absolute left-0 bottom-0 h-1 w-full bg-custom-brown animate-slideIn"></span>
-      )}
-    </button>
-  </div>
-</div>
-
+      <div className="flex w-full justify-center bg-white shadow-lg">
+        <div className="flex border-b border-gray-200 w-full">
+          <button
+            onClick={() => handleTabClick(1)}
+            className={`relative py-4 text-sm font-medium focus:outline-none transition duration-300 w-full ${
+              activeTab === 1 ? 'text-custom-brown' : 'text-gray-500 hover:text-custom-brown'
+            }`}
+          >
+            All Recipes
+            {activeTab === 1 && (
+              <span className="absolute left-0 bottom-0 h-1 w-full bg-custom-brown animate-slideIn"></span>
+            )}
+          </button>
+          <button
+            onClick={() => handleTabClick(2)}
+            className={`relative py-4 text-sm font-medium focus:outline-none transition duration-300 w-full ${
+              activeTab === 2 ? 'text-custom-brown' : 'text-gray-500 hover:text-custom-brown'
+            }`}
+          >
+            Cookbooks
+            {activeTab === 2 && (
+              <span className="absolute left-0 bottom-0 h-1 w-full bg-custom-brown animate-slideIn"></span>
+            )}
+          </button>
+        </div>
+      </div>
 
       {getTabContent()}
 
@@ -251,6 +256,26 @@ console.log(cookbooks)
         profileUserId={userId} // Pass the profile user ID
         currentUserId={currentUser?.uid} // Pass the current user ID
       />
+
+      {/* Bottom Drawer */}
+      <BottomDrawer isOpen={isDrawerOpen} onClose={closeDrawer} >
+        <div className = 'p-4'>
+      {/*<button
+          onClick={closeDrawer}
+          className="mt-6 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
+        >
+          Close Drawer
+        </button>*/}
+        <h2 className="text-xl font-bold mb-4">Subscribe to {userData.name} for $19.99 per month</h2>
+        <StripePaymentDisplay
+  useCustomer={true}
+  customerEmail="liam12crowley@gmail.com"
+  attachPaymentMethod={true}
+  currency="eur" // Specify the currency here
+  destinationAccount="acct_1PP14o4CfuQN95oo" // Specify the Stripe Connect account ID if blank the payment just goes to me
+/>       
+</div>
+      </BottomDrawer>
     </div>
   );
 }

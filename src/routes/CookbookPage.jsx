@@ -1,15 +1,16 @@
 // CookbookPage.jsx
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { doc, getDoc, getDocs, collection, query, where } from "firebase/firestore";
 import { db } from "../firebase-config"; // Adjust the import path as needed
 import { RecipeCard } from "liamc9npm"; // Import your CookbookCard component
-
+ 
 export default function CookbookPage() {
   const { cookbookId } = useParams(); // Get the cookbook ID from the URL
   const [cookbookData, setCookbookData] = useState(null);
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
 
   useEffect(() => {
@@ -90,7 +91,8 @@ export default function CookbookPage() {
       {/* Recipes List */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {recipes.map(recipe => (
-          <RecipeCard key={recipe.id} recipe={recipe} />
+          <RecipeCard key={recipe.id} recipe={recipe} 
+          onCardClick={() => navigate(`/recipeswipepage/${recipe.id}`)}/>
         ))}
       </div>
     </div>

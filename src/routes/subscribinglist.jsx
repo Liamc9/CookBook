@@ -4,7 +4,6 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { db } from "../firebase-config";
 import { doc, getDoc } from "firebase/firestore";
 import Chefcard from "../components/chefcard";
-import Search from "../components/search";
 
 // CREATE FUNCTION
 export default function Subscribinglist() {
@@ -48,11 +47,8 @@ export default function Subscribinglist() {
 
   // HTML
   return (
-    <div>
-      <div className="mt-20 mx-auto w-[90%]">
-        <Search />
-        
-        <div className="mt-10 flex h-screen flex-col gap-4">
+    <div>     
+        <div className="my-20 mx-auto w-[90%] flex h-screen flex-col gap-4">
           <h1 className="text-xl font-bold">Subscribed</h1>
           {subscribingIds.length > 0 ? (
             subscribingIds.map((chefid) => (
@@ -63,6 +59,5 @@ export default function Subscribinglist() {
           )}
         </div>
       </div>
-    </div>
   );
 }
