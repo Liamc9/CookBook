@@ -11,7 +11,21 @@ body {
     padding: 0;
     overscroll-behavior-y: none;
 }
-
-#root {
-    min-height: 100%;
+* {
+    font-family: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
 }
+:root {
+    /* Primary Color and Shades */
+    --color-primary: #B08B5B;           /* Warm Taupe */
+    --color-primary-light: #C19B6D;     /* Light Warm Taupe */
+    --color-primary-very-light: #D2AD80;/* Very Light Warm Taupe */
+    --color-primary-dark: #9A7D4E;      /* Dark Warm Taupe */
+    --color-primary-very-dark: #846E41; /* Very Dark Warm Taupe */
+  
+    /* Neutral Colors */
+    --color-white: #FFFFFF;              /* White */
+    --color-light-gray: #F0F0F0;         /* Light Gray */
+    --color-medium-gray: #C0C0C0;        /* Medium Gray */
+    --color-dark-gray: #4F4F4F;          /* Dark Gray */
+    --color-black: #000000;              /* Black */
+  }

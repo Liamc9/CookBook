@@ -25,8 +25,8 @@ const PageTitle = styled.h1`
 `;
 
 const AddRecipeButton = styled.button`
-  padding: 10px 20px;
-  background-color: #B08B5B;
+  padding: 10px 20px;      
+  background-color: ${'var(--color-primary)'};
   color: white;
   border: none;
   border-radius: 5px;
@@ -34,7 +34,7 @@ const AddRecipeButton = styled.button`
   transition: background-color 0.3s ease;
 
   &:hover {
-    background-color: #45a049;
+    background-color: ${'var(--color-primary-dark)'};
   }
 `;
 
