@@ -14,9 +14,8 @@ import {
   updateProfile,
   signOut,
 } from "firebase/auth";
-import { auth } from "../firebase-config";
+import { auth, db } from "../firebase-config";
 import { doc, setDoc } from "firebase/firestore";
-import { db } from "../firebase-config";
 import { AuthPageView } from "liamc9npm";
 
 const LoginSignupPage = ({ closeModal }) => {

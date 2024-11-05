@@ -7,14 +7,12 @@ import { RecipeCard, CookbookCard, BottomDrawer } from "liamc9npm"; // Imported 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFacebook, faTwitter, faYoutube, faTiktok } from "@fortawesome/free-brands-svg-icons";
 import { faUserEdit } from "@fortawesome/free-solid-svg-icons";
-import SubscriptionModal from "../components/subscriptionmodal";
 import StripePaymentDisplay from "../components/stripePaymentDisplay";
 
 export default function Profile() {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(1);
-  const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
   const [recipes, setRecipes] = useState([]);
   const [cookbooks, setCookbooks] = useState([]);
   const navigate = useNavigate();
@@ -249,13 +247,6 @@ export default function Profile() {
       </div>
 
       {getTabContent()}
-
-      <SubscriptionModal
-        isModalOpen={isSubscriptionModalOpen}
-        closeModal={() => setIsSubscriptionModalOpen(false)}
-        profileUserId={userId} // Pass the profile user ID
-        currentUserId={currentUser?.uid} // Pass the current user ID
-      />
 
       {/* Bottom Drawer */}
       <BottomDrawer isOpen={isDrawerOpen} onClose={closeDrawer} >
